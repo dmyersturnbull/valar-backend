@@ -1,11 +1,11 @@
 {
-    "@context":"https://doi.org/10.5063/schema/codemeta-2.0",
+    "@context":"https://doi.org/10.5063/backend/codemeta-2.0",
     "@type":"SoftwareSourceCode",
-    "identifier":"valar-schema",
-    "name":"valar-schema",
+    "identifier":"valar-backend",
+    "name":"valar-backend",
     "description":"Supporting backend for Valar.",
-    "codeRepository":"https://github.com/dmyersturnbull/valar-schema",
-    "issueTracker":"https://github.com/dmyersturnbull/valar-schema/issues",
+    "codeRepository":"https://github.com/dmyersturnbull/valar-backend",
+    "issueTracker":"https://github.com/dmyersturnbull/valar-backend/issues",
     "license":"https://www.apache.org/licenses/LICENSE-2.0",
     "version":"1.0.0",
     "author":[
@@ -14,6 +14,11 @@
             "givenName":"Douglas",
             "familyName":"Myers-Turnbull",
             "@id":"https://orcid.org/0000-0003-3610-4808"
+        },
+        {
+            "@type":"Person",
+            "givenName":"Chris S",
+            "familyName":"Ki"
         }
     ],
     "contributor":[
@@ -22,11 +27,6 @@
             "givenName":"Cole",
             "familyName":"Helsell",
             "@id":"https://orcid.org/0000-0002-8869-3125"
-        },
-        {
-            "@type":"Person",
-            "givenName":"Chris S",
-            "familyName":"Ki"
         }
     ],
     "maintainer":{
@@ -35,9 +35,9 @@
         "familyName":"Myers-Turnbull",
         "@id":"https://orcid.org/0000-0003-3610-4808"
     },
-    "contIntegration":"https://github.com/dmyersturnbull/valar-schema/actions",
+    "contIntegration":"https://github.com/dmyersturnbull/valar-backend/actions",
     "developmentStatus":"active",
-    "downloadUrl":"https://pypi.org/project/valar-schema/",
+    "downloadUrl":"https://pypi.org/project/valar-backend/",
     "keywords":[
         "zebrafish",
 		"behavior",

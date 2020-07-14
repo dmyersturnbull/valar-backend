@@ -1,5 +1,5 @@
 name := "valar-params"
 
 libraryDependencies ++= Seq(
-	"com.github.kokellab" %% "skale-grammars" % "0.5.0-SNAPSHOT"
+	"com.github.dmyersturnbull" %% "pippin-grammars" % "0.6.0-SNAPSHOT"
 )

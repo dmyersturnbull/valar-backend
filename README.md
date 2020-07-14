@@ -106,7 +106,7 @@ chemspiderToken=...
 valar_api_key=...
 ```
 
-0. Install Scala 2.12, Maven, and Simple Build Tool (sbt) 1.0+: `brew install scala maven sbt` or preferably manual download on Linux
+0. Install Scala 2.13, Maven, and Simple Build Tool (sbt) 1.3+: `brew install scala maven sbt` or preferably manual download on Linux
 1. Clone [skale](https://github.com/kokellab/skale) (`git clone https://github.com/dmyersturnbull/skale`)
 2. Build skale and publish it to your local Ivy repository: `cd skale; sbt publishLocal`
 3. Navigate back to valar and build only the core subproject with run `sbt core/publishLocal`

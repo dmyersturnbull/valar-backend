@@ -1,4 +1,4 @@
-package kokellab.valar.importer
+package valar.importer
 
 import java.nio.file.Paths
 

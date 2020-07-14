@@ -1,5 +1,5 @@
 name := "valar-core"
 libraryDependencies ++= Seq(
-	"com.github.kokellab" %% "skale-core" % "0.5.0-SNAPSHOT",
-	"com.github.kokellab" %% "skale-logconfig" % "0.5.0-SNAPSHOT"
+	"com.github.dmyersturnbull" %% "pippin-core" % "0.6.0-SNAPSHOT",
+	"com.github.dmyersturnbull" %% "pippin-logconfig" % "0.6.0-SNAPSHOT"
 )

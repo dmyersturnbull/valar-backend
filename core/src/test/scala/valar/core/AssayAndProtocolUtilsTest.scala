@@ -1,5 +1,5 @@
 package valar.core
 
-class AssayAndProtocolUtilsTest {
+class AssayAndBatteryUtilsTest {
 
 }

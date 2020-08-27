@@ -30,7 +30,7 @@ sealed trait GenSensor extends LazyLogging {
 	def requiredFiles: Set[RequiredFile]
 	def resolve(result: SubmissionResult): Map[RequiredFile, Path] =
 		(requiredFiles map (f => f -> f.resolve(parentDir(result)))).toMap
-	def apply(plateRun: RunsRow, nProtocolMillis: Int)
+	def apply(plateRun: RunsRow, nBatteryMillis: Int)
 	def name: String = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getClass.getSimpleName.replace("Sensor", ""))
 
 	protected def insert(plateRun: RunsRow, sensor: SensorsRow, data: Traversable[Byte]): Unit = {
@@ -109,7 +109,7 @@ class RegistrySensorProcessor(result: SubmissionResult) extends Processor(result
 		for (sensor <- sensors) {
 			logger.info(s"Processing sensor ${sensor.name}")
 			try {
-				sensor.apply(run, protocolLength(run))
+				sensor.apply(run, batteryLength(run))
 			} catch {
 			      case e: MissingResourceException =>
 				    if (sensor.isOptional) logger.error(s"Failed to process $sensor", e)
@@ -132,9 +132,9 @@ class SnapshotSensor(result: SubmissionResult) extends Timing with LazyLogging {
 	private val snapshotFile = RequiredFile("snapshots", Set(Paths.get("timing", "snapshots.list.csv"), Paths.get("sensors", "snapshots.list.csv")))
 	override def requiredFiles: Set[RequiredFile] = Set(snapshotFile)
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
 
-		val helper = new SensorHelper(result, plateRun, nProtocolMillis)
+		val helper = new SensorHelper(result, plateRun, nBatteryMillis)
 		val snapshotPath = resolve(result)(snapshotFile)
 
 		val millis = helper.toMillis(snapshotPath)
@@ -163,8 +163,8 @@ class StimuliSensor(result: SubmissionResult) extends Timing with LazyLogging {
 	private val stimuliFile = RequiredFile("stimuli", Set(Paths.get("timing", "stimuli.csv"), Paths.get("sensors", "stimuli.csv")))
 	override def requiredFiles: Set[RequiredFile] = Set(stimuliFile)
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
-		val helper = new SensorHelper(result, plateRun, nProtocolMillis)
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
+		val helper = new SensorHelper(result, plateRun, nBatteryMillis)
 
 		val reader = TextUtils.openCsvReader(stimuliFile.resolve(result.root))
 		val timeData = scala.collection.mutable.ArrayBuffer.empty[Byte]
@@ -200,8 +200,8 @@ class MicrophoneSensor(result: SubmissionResult) extends Sensor with LazyLogging
 	private val timestampsFile = RequiredFile("microphone_times.txt", Set(Paths.get("sensors", "microphone_times.txt")))
 	override def requiredFiles: Set[RequiredFile] = Set(wavFile, timestampsFile)
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
-		val helper = new SensorHelper(result, plateRun, nProtocolMillis)
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
+		val helper = new SensorHelper(result, plateRun, nBatteryMillis)
 		val timeData = scala.collection.mutable.ArrayBuffer.empty[Byte]
 		var stream: InputStream = null
 		try {
@@ -239,7 +239,7 @@ class PreviewSensor(result: SubmissionResult) extends Sensor with LazyLogging {
 	private val file = RequiredFile("preview.jpg", Set(Paths.get("preview.jpg"), Paths.get("sensors/preview.jpg")))
 	override def requiredFiles: Set[RequiredFile] = Set(file)
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
 		var stream: InputStream = null
 		try {
 			stream = Files.newInputStream(file.resolve(result.root))
@@ -270,7 +270,7 @@ class WebcamSensor(result: SubmissionResult) extends Sensor with LazyLogging {
 	override def requiredFiles: Set[RequiredFile] = Set(file)
 	override val isOptional = true
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
 		var stream: InputStream = null
 		try {
 			stream = Files.newInputStream(file.resolve(result.root))
@@ -306,8 +306,8 @@ abstract class CsvSensor(result: SubmissionResult) extends Sensor with LazyLoggi
 	private val csvFile = RequiredFile(filename, Set(Paths.get("sensors", filename)))
 	override def requiredFiles: Set[RequiredFile] = Set(csvFile)
 
-	override def apply(plateRun: RunsRow, nProtocolMillis: Int): Unit = {
-		val helper = new SensorHelper(result, plateRun, nProtocolMillis)
+	override def apply(plateRun: RunsRow, nBatteryMillis: Int): Unit = {
+		val helper = new SensorHelper(result, plateRun, nBatteryMillis)
 
 		val reader = TextUtils.openCsvReader(csvFile.resolve(result.root))
 		val timeData = scala.collection.mutable.ArrayBuffer.empty[Byte]
@@ -343,7 +343,7 @@ class ThermometerSensor(result: SubmissionResult) extends CsvSensor(result) {
 }
 
 
-class SensorHelper(result: SubmissionResult, plateRun: RunsRow, nProtocolMillis: Int) {
+class SensorHelper(result: SubmissionResult, plateRun: RunsRow, nBatteryMillis: Int) {
 
 	val timezone = result.config.local.timezone.name
 	val start = result.environment.datetimeStarted.atZone(timezone)

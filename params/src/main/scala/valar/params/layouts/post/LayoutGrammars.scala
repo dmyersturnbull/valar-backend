@@ -18,7 +18,7 @@ import scala.util.Try
   * This does not handle parameterizations: LayoutParameterization does and wraps around LayoutGrammars.
   * Where applicable, each of these fetches rows:
   * 	- fetches from Valar
-  * 	- parses skale grammars
+  * 	- parses pippin grammars
   * 	- handles surrounding quotes
   * 	- verifies that values are reasonable.
   */

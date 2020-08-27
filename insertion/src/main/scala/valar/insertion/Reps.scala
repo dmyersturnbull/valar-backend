@@ -91,7 +91,7 @@ case class ExperimentData(
 	creator: Int
 )
 
-case class SuperprojectData(
+case class ProjectData(
 	name: String,
 	projectType: Byte,
 	description: Option[String],
@@ -163,7 +163,6 @@ case class CompoundData(
 	compoundLabelsText: Option[String],
 	batchLabelsText: Option[String],
 	notes: Option[String],
-	suspicious: Boolean,
 	creator: Int
 ) {
 	def hasInchi: Boolean = inchi.trim != "*"

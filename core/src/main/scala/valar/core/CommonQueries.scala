@@ -90,7 +90,7 @@ object CommonQueries {
 
 	def listSubmissions: Seq[SubmissionsRow] = exec(Submissions.result)
 
-	def listSuperprojects: Seq[SuperprojectsRow] = exec(Superprojects.result)
+	def listProjects: Seq[ProjectsRow] = exec(Projects.result)
 
 	def listActiveExperiments: Seq[ExperimentsRow] = exec((Experiments filter (_.active)).result)
 
@@ -105,7 +105,7 @@ object CommonQueries {
 
 	def listTemplateStimulusFrames: Seq[TemplateStimulusFramesRow] = exec(TemplateStimulusFrames.result)
 
-	def listProtocols: Seq[BatteriesRow] = exec(Batteries.result)
+	def listBatteries: Seq[BatteriesRow] = exec(Batteries.result)
 
 	def listAssays: Seq[AssaysRow] = exec(Assays.result)
 

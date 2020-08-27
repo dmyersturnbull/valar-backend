@@ -14,7 +14,7 @@ object ExperimentInsertion {
 	import valar.core.Tables.profile.api._
 
 	def insert(data: ExperimentData): ExperimentsRow = attempt { () => {
-		val project = exec((Superprojects filter (_.id === data.project)).result).head
+		val project = exec((Projects filter (_.id === data.project)).result).head
 		if (!(data.name startsWith (project.name + " :: "))) {
 			throw new ValidationException(s"The experiment name must begin with ${project.name + " :: "}")
 		}

@@ -28,7 +28,7 @@ package object importer {
 	class FeatureCalculationFailedException(message: String = null, cause: Throwable = null) extends Exception(message, cause) with ValarImporterException
 	class RequestNotImplementedException(message: String = null, cause: Throwable = null) extends Exception(message, cause) with ValarImporterException
 
-	def protocolLength(plateRun: RunsRow): Int = {
+	def batteryLength(plateRun: RunsRow): Int = {
 		exec((for {
 			(experiment, battery) <- Experiments join Batteries on (_.batteryId === _.id)
 			if experiment.id === plateRun.experimentId

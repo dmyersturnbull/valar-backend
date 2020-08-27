@@ -22,9 +22,9 @@ object RowHashes {
 	import valar.core.Tables._
 	import valar.core.Tables.profile.api._
 
-	def protocolHash(assayProtocolInfos: Seq[AssayInProtocolInfo]): Array[Byte] = {
+	def batteryHash(assayBatteryInfos: Seq[AssayInBatteryInfo]): Array[Byte] = {
 		bytesToHash(
-			assayProtocolInfos sortBy (_.start) flatMap (info => {
+			assayBatteryInfos sortBy (_.start) flatMap (info => {
 				val assays = exec((Assays filter (_.id === info.assayId)).result)
 				assert(assays.size == 1)
 				val assay = assays.head
@@ -34,8 +34,8 @@ object RowHashes {
 	}
 
 	def batteryHash(assays: Seq[AssaysRow]): Array[Byte] = {
-		val x = (assays zip assayStarts(assays)) map (t => AssayInProtocolInfo(t._1.id, t._2))
-		protocolHash(x)
+		val x = (assays zip assayStarts(assays)) map (t => AssayInBatteryInfo(t._1.id, t._2))
+		batteryHash(x)
 	}
 
 	def assayStarts(assays: Seq[AssaysRow]): Seq[Int] = {
@@ -58,19 +58,19 @@ object RowHashes {
 		StimFramesAndHash(stimIds.head, assayFrames, stimframesHash)
 	}
 
-	def findMatchingProtocol(protocolHash: Array[Byte]): Option[MatchingProtocol] = {
+	def findMatchingBattery(batteryHash: Array[Byte]): Option[MatchingBattery] = {
 
-		// find a protocol that has exactly those Assays
+		// find a battery that has exactly those Assays
 		// this problem again: can't filter by blob
-		val allProtocols = exec((
+		val allBatteries = exec((
 			Batteries map (row => (row.id, row.name, row.assaysSha1))
 		).result)
-		val matchingProtocols = (allProtocols
-			map (b => MatchingProtocol(b._1, b._2, b._3))
-			filter (mp => blobToBytes(mp.hash) sameElements protocolHash)
+		val matchingBatteries = (allBatteries
+			map (b => MatchingBattery(b._1, b._2, b._3))
+			filter (mp => blobToBytes(mp.hash) sameElements batteryHash)
 		)
-		assert(matchingProtocols.size < 2, s"Somehow the protocol matches two or more protocols in the database: ${matchingProtocols.map(_.id.toString).mkString(", ")}")
-		matchingProtocols.headOption
+		assert(matchingBatteries.size < 2, s"Somehow the battery matches two or more batteries in the database: ${matchingBatteries.map(_.id.toString).mkString(", ")}")
+		matchingBatteries.headOption
 	}
 
 	def findMatchingAssays(hashOfAssay: Array[Byte]): Seq[MatchingAssay] = {
@@ -130,12 +130,12 @@ object RowHashes {
 case class StimulusFramesInfo(stimulusId: Int, start: Int, end: Int)
 
 case class MatchingAssay(id: Int, name: String, hash: Blob)
-case class MatchingProtocol(id: Int, name: String, hash: Blob)
+case class MatchingBattery(id: Int, name: String, hash: Blob)
 
 case class Assay(name: String, start: Int, stop: Int, length: Int) {
 	require(length == stop - start)
 }
 
-case class AssayInProtocolInfo(assayId: Int, start: Int)
+case class AssayInBatteryInfo(assayId: Int, start: Int)
 
 case class StimFramesAndHash(stimSourceId: Int, frames: Array[Byte], hash: Array[Byte])

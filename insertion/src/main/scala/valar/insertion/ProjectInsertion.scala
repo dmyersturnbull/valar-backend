@@ -13,13 +13,13 @@ object ProjectInsertion {
 	import valar.core.Tables._
 	import valar.core.Tables.profile.api._
 
-	def insert(data: SuperprojectData): SuperprojectsRow = attempt { () => {
+	def insert(data: ProjectData): ProjectsRow = attempt { () => {
 		val projectType = exec((ProjectTypes filter (_.id === data.projectType)).result).head
 		if (!(data.name startsWith (projectType.name + " :: "))) {
 			throw new ValidationException(s"The project name must begin with ${projectType.name + " :: "}")
 		}
-		val query = Superprojects returning (Superprojects map (_.id)) into ((newRow, id) => newRow.copy(id = id))
-		exec(query += SuperprojectsRow(
+		val query = Projects returning (Projects map (_.id)) into ((newRow, id) => newRow.copy(id = id))
+		exec(query += ProjectsRow(
 			id = 0,
 			name = data.name,
 			typeId = Some(data.projectType),

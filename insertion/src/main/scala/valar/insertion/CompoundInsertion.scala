@@ -74,7 +74,6 @@ object CompoundInsertion {
 			supplierCatalogNumber = data.catalogNumber,
 			legacyInternalId = genLegacyId(data),
 			lookupHash = newTmpHash(), // we'll fix in a minute
-			suspicious = data.suspicious,
 			created = timestamp()
 		))
 		exec(Batches filter (_.id === batch.id) map (_.lookupHash) update  genLookupHash(batch))

@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(Annotations.schema, ApiKeys.schema, AssayParams.schema, AssayPositions.schema, Assays.schema, AudioFiles.schema, Batches.schema, BatchLabels.schema, Batteries.schema, BiomarkerExperiments.schema, BiomarkerLevels.schema, Biomarkers.schema, BiomarkerSamples.schema, BiomarkerTreatments.schema, CarpProjects.schema, CarpProjectTypes.schema, CarpScans.schema, CarpSystemData.schema, CarpTanks.schema, CarpTankTasks.schema, CarpTankTypes.schema, CarpTasks.schema, ComponentChecks.schema, CompoundLabels.schema, Compounds.schema, ConfigFiles.schema, ControlTypes.schema, Experiments.schema, Features.schema, GeneLabels.schema, Genes.schema, GeneticConstructFeatures.schema, GeneticConstructs.schema, GeneticEvents.schema, GeneticKnockins.schema, GeneticVariants.schema, Locations.schema, LogFiles.schema, MandosExpression.schema, MandosInfo.schema, MandosObjectLinks.schema, MandosObjects.schema, MandosObjectTags.schema, MandosPredicates.schema, MandosRules.schema, MandosRuleTags.schema, Plates.schema, PlateTypes.schema, ProjectTypes.schema, Refs.schema, Rois.schema, Runs.schema, RunTags.schema, SauronConfigs.schema, Saurons.schema, SauronSettings.schema, SensorData.schema, Sensors.schema, Stimuli.schema, StimulusFrames.schema, SubmissionParams.schema, SubmissionRecords.schema, Submissions.schema, Superprojects.schema, Suppliers.schema, TemplateAssays.schema, TemplatePlates.schema, TemplateStimulusFrames.schema, TemplateTreatments.schema, TemplateWells.schema, Tissues.schema, TransferPlates.schema, Users.schema, VAnnotations.schema, VCarpProjects.schema, VCarpRecentTankTask.schema, VCarpScans.schema, VCarpTanks.schema, VCarpTankTypes.schema, VExperiments.schema, VMandosRules.schema, VRuns.schema, WellFeatures.schema, Wells.schema, WellTreatments.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(Annotations.schema, AssayParams.schema, AssayPositions.schema, Assays.schema, AudioFiles.schema, Batches.schema, BatchLabels.schema, Batteries.schema, Compounds.schema, ConfigFiles.schema, ControlTypes.schema, Experiments.schema, Features.schema, GeneticVariants.schema, Locations.schema, LogFiles.schema, MandosExpression.schema, MandosInfo.schema, MandosObjectLinks.schema, MandosObjects.schema, MandosObjectTags.schema, MandosPredicates.schema, MandosRules.schema, MandosRuleTags.schema, Plates.schema, PlateTypes.schema, ProjectTypes.schema, Refs.schema, Rois.schema, Runs.schema, RunTags.schema, SauronConfigs.schema, Saurons.schema, SauronSettings.schema, SensorData.schema, Sensors.schema, Stimuli.schema, StimulusFrames.schema, SubmissionParams.schema, SubmissionRecords.schema, Submissions.schema, Projects.schema, Suppliers.schema, TemplateAssays.schema, TemplatePlates.schema, TemplateStimulusFrames.schema, TemplateTreatments.schema, TemplateWells.schema, Tissues.schema, TransferPlates.schema, Users.schema, VAnnotations.schema, VExperiments.schema, VMandosRules.schema, VRuns.schema, WellFeatures.schema, Wells.schema, WellTreatments.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -84,32 +84,6 @@ trait Tables {
   /** Collection-like TableQuery object for table Annotations */
   lazy val Annotations = new TableQuery(tag => new Annotations(tag))
 
-  /** Entity class storing rows of table ApiKeys
-   *  @param id Database column id SqlType(TINYINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param value Database column value SqlType(VARCHAR), Length(255,true) */
-  case class ApiKeysRow(id: Byte, name: String, value: String)
-  /** GetResult implicit for fetching ApiKeysRow objects using plain SQL queries */
-  implicit def GetResultApiKeysRow(implicit e0: GR[Byte], e1: GR[String]): GR[ApiKeysRow] = GR{
-    prs => import prs._
-    ApiKeysRow.tupled((<<[Byte], <<[String], <<[String]))
-  }
-  /** Table description of table api_keys. Objects of this class serve as prototypes for rows in queries. */
-  class ApiKeys(_tableTag: Tag) extends profile.api.Table[ApiKeysRow](_tableTag, Some("valar"), "api_keys") {
-    def * = (id, name, value) <> (ApiKeysRow.tupled, ApiKeysRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(value)).shaped.<>({r=>import r._; _1.map(_=> ApiKeysRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(TINYINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Byte] = column[Byte]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column value SqlType(VARCHAR), Length(255,true) */
-    val value: Rep[String] = column[String]("value", O.Length(255,varying=true))
-  }
-  /** Collection-like TableQuery object for table ApiKeys */
-  lazy val ApiKeys = new TableQuery(tag => new ApiKeys(tag))
-
   /** Entity class storing rows of table AssayParams
    *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
    *  @param assayId Database column assay_id SqlType(SMALLINT UNSIGNED)
@@ -171,13 +145,13 @@ trait Tables {
     /** Database column start SqlType(INT UNSIGNED) */
     val start: Rep[Int] = column[Int]("start")
 
-    /** Foreign key referencing Assays (database name assay_in_protocol_to_assay) */
-    lazy val assaysFk = foreignKey("assay_in_protocol_to_assay", assayId, Assays)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Batteries (database name assay_in_protocol_to_protocol) */
-    lazy val batteriesFk = foreignKey("assay_in_protocol_to_protocol", batteryId, Batteries)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
+    /** Foreign key referencing Assays (database name assay_in_battery_to_assay) */
+    lazy val assaysFk = foreignKey("assay_in_battery_to_assay", assayId, Assays)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Batteries (database name assay_in_battery_to_battery) */
+    lazy val batteriesFk = foreignKey("assay_in_battery_to_battery", batteryId, Batteries)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
 
-    /** Uniqueness Index over (batteryId,assayId,start) (database name protocol_assay_start_unique) */
-    val index1 = index("protocol_assay_start_unique", (batteryId, assayId, start), unique=true)
+    /** Uniqueness Index over (batteryId,assayId,start) (database name battery_assay_start_unique) */
+    val index1 = index("battery_assay_start_unique", (batteryId, assayId, start), unique=true)
     /** Index over (start) (database name start) */
     val index2 = index("start", start)
   }
@@ -307,9 +281,8 @@ trait Tables {
    *  @param personOrdered Database column person_ordered SqlType(SMALLINT UNSIGNED), Default(None)
    *  @param dateOrdered Database column date_ordered SqlType(DATE), Default(None)
    *  @param notes Database column notes SqlType(TEXT), Default(None)
-   *  @param suspicious Database column suspicious SqlType(BIT), Default(false)
    *  @param created Database column created SqlType(TIMESTAMP) */
-  case class BatchesRow(id: Int, lookupHash: String, tag: Option[String] = None, compoundId: Option[Int] = None, madeFromId: Option[Int] = None, supplierId: Option[Int] = None, refId: Option[Int] = None, legacyInternalId: Option[String] = None, locationId: Option[Int] = None, boxNumber: Option[Int] = None, wellNumber: Option[Int] = None, locationNote: Option[String] = None, amount: Option[String] = None, concentrationMillimolar: Option[Double] = None, solventId: Option[Int] = None, molecularWeight: Option[Double] = None, supplierCatalogNumber: Option[String] = None, personOrdered: Option[Int] = None, dateOrdered: Option[java.sql.Date] = None, notes: Option[String] = None, suspicious: Boolean = false, created: java.sql.Timestamp)
+  case class BatchesRow(id: Int, lookupHash: String, tag: Option[String] = None, compoundId: Option[Int] = None, madeFromId: Option[Int] = None, supplierId: Option[Int] = None, refId: Option[Int] = None, legacyInternalId: Option[String] = None, locationId: Option[Int] = None, boxNumber: Option[Int] = None, wellNumber: Option[Int] = None, locationNote: Option[String] = None, amount: Option[String] = None, concentrationMillimolar: Option[Double] = None, solventId: Option[Int] = None, molecularWeight: Option[Double] = None, supplierCatalogNumber: Option[String] = None, personOrdered: Option[Int] = None, dateOrdered: Option[java.sql.Date] = None, notes: Option[String] = None, created: java.sql.Timestamp)
   /** GetResult implicit for fetching BatchesRow objects using plain SQL queries */
   implicit def GetResultBatchesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Int]], e4: GR[Option[Double]], e5: GR[Option[java.sql.Date]], e6: GR[Boolean], e7: GR[java.sql.Timestamp]): GR[BatchesRow] = GR{
     prs => import prs._
@@ -317,9 +290,9 @@ trait Tables {
   }
   /** Table description of table batches. Objects of this class serve as prototypes for rows in queries. */
   class Batches(_tableTag: Tag) extends profile.api.Table[BatchesRow](_tableTag, Some("valar"), "batches") {
-    def * = (id, lookupHash, tag, compoundId, madeFromId, supplierId, refId, legacyInternalId, locationId, boxNumber, wellNumber, locationNote, amount, concentrationMillimolar, solventId, molecularWeight, supplierCatalogNumber, personOrdered, dateOrdered, notes, suspicious, created) <> (BatchesRow.tupled, BatchesRow.unapply)
+    def * = (id, lookupHash, tag, compoundId, madeFromId, supplierId, refId, legacyInternalId, locationId, boxNumber, wellNumber, locationNote, amount, concentrationMillimolar, solventId, molecularWeight, supplierCatalogNumber, personOrdered, dateOrdered, notes, created) <> (BatchesRow.tupled, BatchesRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(lookupHash), tag, compoundId, madeFromId, supplierId, refId, legacyInternalId, locationId, boxNumber, wellNumber, locationNote, amount, concentrationMillimolar, solventId, molecularWeight, supplierCatalogNumber, personOrdered, dateOrdered, notes, Rep.Some(suspicious), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BatchesRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21.get, _22.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(lookupHash), tag, compoundId, madeFromId, supplierId, refId, legacyInternalId, locationId, boxNumber, wellNumber, locationNote, amount, concentrationMillimolar, solventId, molecularWeight, supplierCatalogNumber, personOrdered, dateOrdered, notes, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BatchesRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
@@ -361,8 +334,6 @@ trait Tables {
     val dateOrdered: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("date_ordered", O.Default(None))
     /** Database column notes SqlType(TEXT), Default(None) */
     val notes: Rep[Option[String]] = column[Option[String]]("notes", O.Default(None))
-    /** Database column suspicious SqlType(BIT), Default(false) */
-    val suspicious: Rep[Boolean] = column[Boolean]("suspicious", O.Default(false))
     /** Database column created SqlType(TIMESTAMP) */
     val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
 
@@ -483,8 +454,8 @@ trait Tables {
     /** Database column created SqlType(TIMESTAMP) */
     val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
 
-    /** Foreign key referencing Users (database name protocol_to_user) */
-    lazy val usersFk = foreignKey("protocol_to_user", authorId, Users)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Users (database name battery_to_user) */
+    lazy val usersFk = foreignKey("battery_to_user", authorId, Users)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
 
     /** Index over (assaysSha1) (database name assays_sha1) */
     val index1 = index("assays_sha1", assaysSha1)
@@ -492,641 +463,11 @@ trait Tables {
     val index2 = index("length", length)
     /** Uniqueness Index over (name) (database name name_unique) */
     val index3 = index("name_unique", name, unique=true)
-    /** Index over (templateId) (database name protocol_to_template) */
-    val index4 = index("protocol_to_template", templateId)
+    /** Index over (templateId) (database name battery_to_template) */
+    val index4 = index("battery_to_template", templateId)
   }
   /** Collection-like TableQuery object for table Batteries */
   lazy val Batteries = new TableQuery(tag => new Batteries(tag))
-
-  /** Entity class storing rows of table BiomarkerExperiments
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param tag Database column tag SqlType(VARCHAR), Length(50,true)
-   *  @param description Database column description SqlType(VARCHAR), Length(250,true)
-   *  @param kind Database column kind SqlType(ENUM), Length(7,false)
-   *  @param experimentalistId Database column experimentalist_id SqlType(SMALLINT UNSIGNED)
-   *  @param refId Database column ref_id SqlType(SMALLINT UNSIGNED)
-   *  @param datetimePrepared Database column datetime_prepared SqlType(DATETIME)
-   *  @param datetimeCollected Database column datetime_collected SqlType(DATETIME)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class BiomarkerExperimentsRow(id: Int, tag: String, description: String, kind: String, experimentalistId: Int, refId: Int, datetimePrepared: java.sql.Timestamp, datetimeCollected: java.sql.Timestamp, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching BiomarkerExperimentsRow objects using plain SQL queries */
-  implicit def GetResultBiomarkerExperimentsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[BiomarkerExperimentsRow] = GR{
-    prs => import prs._
-    BiomarkerExperimentsRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<[Int], <<[Int], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table biomarker_experiments. Objects of this class serve as prototypes for rows in queries. */
-  class BiomarkerExperiments(_tableTag: Tag) extends profile.api.Table[BiomarkerExperimentsRow](_tableTag, Some("valar"), "biomarker_experiments") {
-    def * = (id, tag, description, kind, experimentalistId, refId, datetimePrepared, datetimeCollected, created) <> (BiomarkerExperimentsRow.tupled, BiomarkerExperimentsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(tag), Rep.Some(description), Rep.Some(kind), Rep.Some(experimentalistId), Rep.Some(refId), Rep.Some(datetimePrepared), Rep.Some(datetimeCollected), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BiomarkerExperimentsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column tag SqlType(VARCHAR), Length(50,true) */
-    val tag: Rep[String] = column[String]("tag", O.Length(50,varying=true))
-    /** Database column description SqlType(VARCHAR), Length(250,true) */
-    val description: Rep[String] = column[String]("description", O.Length(250,varying=true))
-    /** Database column kind SqlType(ENUM), Length(7,false) */
-    val kind: Rep[String] = column[String]("kind", O.Length(7,varying=false))
-    /** Database column experimentalist_id SqlType(SMALLINT UNSIGNED) */
-    val experimentalistId: Rep[Int] = column[Int]("experimentalist_id")
-    /** Database column ref_id SqlType(SMALLINT UNSIGNED) */
-    val refId: Rep[Int] = column[Int]("ref_id")
-    /** Database column datetime_prepared SqlType(DATETIME) */
-    val datetimePrepared: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("datetime_prepared")
-    /** Database column datetime_collected SqlType(DATETIME) */
-    val datetimeCollected: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("datetime_collected")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing Refs (database name biomarker_experiment_to_ref) */
-    lazy val refsFk = foreignKey("biomarker_experiment_to_ref", refId, Refs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Users (database name biomarker_experiment_to_user) */
-    lazy val usersFk = foreignKey("biomarker_experiment_to_user", experimentalistId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (tag) (database name tag_unique) */
-    val index1 = index("tag_unique", tag, unique=true)
-  }
-  /** Collection-like TableQuery object for table BiomarkerExperiments */
-  lazy val BiomarkerExperiments = new TableQuery(tag => new BiomarkerExperiments(tag))
-
-  /** Entity class storing rows of table BiomarkerLevels
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param sampleId Database column sample_id SqlType(SMALLINT UNSIGNED)
-   *  @param biomarkerId Database column biomarker_id SqlType(INT UNSIGNED)
-   *  @param tissueId Database column tissue_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param foldChange Database column fold_change SqlType(DOUBLE UNSIGNED), Default(None)
-   *  @param fullValue Database column full_value SqlType(VARCHAR), Length(250,true)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class BiomarkerLevelsRow(id: Int, sampleId: Int, biomarkerId: Int, tissueId: Option[Int] = None, foldChange: Option[Double] = None, fullValue: String, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching BiomarkerLevelsRow objects using plain SQL queries */
-  implicit def GetResultBiomarkerLevelsRow(implicit e0: GR[Int], e1: GR[Option[Int]], e2: GR[Option[Double]], e3: GR[String], e4: GR[java.sql.Timestamp]): GR[BiomarkerLevelsRow] = GR{
-    prs => import prs._
-    BiomarkerLevelsRow.tupled((<<[Int], <<[Int], <<[Int], <<?[Int], <<?[Double], <<[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table biomarker_levels. Objects of this class serve as prototypes for rows in queries. */
-  class BiomarkerLevels(_tableTag: Tag) extends profile.api.Table[BiomarkerLevelsRow](_tableTag, Some("valar"), "biomarker_levels") {
-    def * = (id, sampleId, biomarkerId, tissueId, foldChange, fullValue, created) <> (BiomarkerLevelsRow.tupled, BiomarkerLevelsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(sampleId), Rep.Some(biomarkerId), tissueId, foldChange, Rep.Some(fullValue), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BiomarkerLevelsRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column sample_id SqlType(SMALLINT UNSIGNED) */
-    val sampleId: Rep[Int] = column[Int]("sample_id")
-    /** Database column biomarker_id SqlType(INT UNSIGNED) */
-    val biomarkerId: Rep[Int] = column[Int]("biomarker_id")
-    /** Database column tissue_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val tissueId: Rep[Option[Int]] = column[Option[Int]]("tissue_id", O.Default(None))
-    /** Database column fold_change SqlType(DOUBLE UNSIGNED), Default(None) */
-    val foldChange: Rep[Option[Double]] = column[Option[Double]]("fold_change", O.Default(None))
-    /** Database column full_value SqlType(VARCHAR), Length(250,true) */
-    val fullValue: Rep[String] = column[String]("full_value", O.Length(250,varying=true))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing BiomarkerSamples (database name biomarker_level_to_sample) */
-    lazy val biomarkerSamplesFk = foreignKey("biomarker_level_to_sample", sampleId, BiomarkerSamples)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing Biomarkers (database name biomarker_level_to_biomarker) */
-    lazy val biomarkersFk = foreignKey("biomarker_level_to_biomarker", biomarkerId, Biomarkers)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-  }
-  /** Collection-like TableQuery object for table BiomarkerLevels */
-  lazy val BiomarkerLevels = new TableQuery(tag => new BiomarkerLevels(tag))
-
-  /** Entity class storing rows of table Biomarkers
-   *  @param id Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(250,true)
-   *  @param isGeneId Database column is_gene_id SqlType(MEDIUMINT UNSIGNED), Default(None)
-   *  @param refId Database column ref_id SqlType(SMALLINT UNSIGNED) */
-  case class BiomarkersRow(id: Int, name: String, isGeneId: Option[Int] = None, refId: Int)
-  /** GetResult implicit for fetching BiomarkersRow objects using plain SQL queries */
-  implicit def GetResultBiomarkersRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Int]]): GR[BiomarkersRow] = GR{
-    prs => import prs._
-    BiomarkersRow.tupled((<<[Int], <<[String], <<?[Int], <<[Int]))
-  }
-  /** Table description of table biomarkers. Objects of this class serve as prototypes for rows in queries. */
-  class Biomarkers(_tableTag: Tag) extends profile.api.Table[BiomarkersRow](_tableTag, Some("valar"), "biomarkers") {
-    def * = (id, name, isGeneId, refId) <> (BiomarkersRow.tupled, BiomarkersRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), isGeneId, Rep.Some(refId)).shaped.<>({r=>import r._; _1.map(_=> BiomarkersRow.tupled((_1.get, _2.get, _3, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(250,true) */
-    val name: Rep[String] = column[String]("name", O.Length(250,varying=true))
-    /** Database column is_gene_id SqlType(MEDIUMINT UNSIGNED), Default(None) */
-    val isGeneId: Rep[Option[Int]] = column[Option[Int]]("is_gene_id", O.Default(None))
-    /** Database column ref_id SqlType(SMALLINT UNSIGNED) */
-    val refId: Rep[Int] = column[Int]("ref_id")
-
-    /** Foreign key referencing Genes (database name biomarker_to_gene) */
-    lazy val genesFk = foreignKey("biomarker_to_gene", isGeneId, Genes)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.SetNull)
-    /** Foreign key referencing Refs (database name biomarker_to_ref) */
-    lazy val refsFk = foreignKey("biomarker_to_ref", refId, Refs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-  }
-  /** Collection-like TableQuery object for table Biomarkers */
-  lazy val Biomarkers = new TableQuery(tag => new Biomarkers(tag))
-
-  /** Entity class storing rows of table BiomarkerSamples
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param experimentId Database column experiment_id SqlType(SMALLINT UNSIGNED)
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param controlTypeId Database column control_type_id SqlType(TINYINT UNSIGNED)
-   *  @param fromWellId Database column from_well_id SqlType(MEDIUMINT UNSIGNED), Default(None)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class BiomarkerSamplesRow(id: Int, experimentId: Int, name: String, controlTypeId: Byte, fromWellId: Option[Int] = None, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching BiomarkerSamplesRow objects using plain SQL queries */
-  implicit def GetResultBiomarkerSamplesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Byte], e3: GR[Option[Int]], e4: GR[java.sql.Timestamp]): GR[BiomarkerSamplesRow] = GR{
-    prs => import prs._
-    BiomarkerSamplesRow.tupled((<<[Int], <<[Int], <<[String], <<[Byte], <<?[Int], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table biomarker_samples. Objects of this class serve as prototypes for rows in queries. */
-  class BiomarkerSamples(_tableTag: Tag) extends profile.api.Table[BiomarkerSamplesRow](_tableTag, Some("valar"), "biomarker_samples") {
-    def * = (id, experimentId, name, controlTypeId, fromWellId, created) <> (BiomarkerSamplesRow.tupled, BiomarkerSamplesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(experimentId), Rep.Some(name), Rep.Some(controlTypeId), fromWellId, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BiomarkerSamplesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column experiment_id SqlType(SMALLINT UNSIGNED) */
-    val experimentId: Rep[Int] = column[Int]("experiment_id")
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column control_type_id SqlType(TINYINT UNSIGNED) */
-    val controlTypeId: Rep[Byte] = column[Byte]("control_type_id")
-    /** Database column from_well_id SqlType(MEDIUMINT UNSIGNED), Default(None) */
-    val fromWellId: Rep[Option[Int]] = column[Option[Int]]("from_well_id", O.Default(None))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing BiomarkerExperiments (database name biomarker_sample_to_biomarker_experiment) */
-    lazy val biomarkerExperimentsFk = foreignKey("biomarker_sample_to_biomarker_experiment", experimentId, BiomarkerExperiments)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing ControlTypes (database name biomarker_sample_to_control_type) */
-    lazy val controlTypesFk = foreignKey("biomarker_sample_to_control_type", controlTypeId, ControlTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Wells (database name biomarker_sample_to_well) */
-    lazy val wellsFk = foreignKey("biomarker_sample_to_well", fromWellId, Wells)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (name,experimentId) (database name name_experiment_unique) */
-    val index1 = index("name_experiment_unique", (name, experimentId), unique=true)
-  }
-  /** Collection-like TableQuery object for table BiomarkerSamples */
-  lazy val BiomarkerSamples = new TableQuery(tag => new BiomarkerSamples(tag))
-
-  /** Entity class storing rows of table BiomarkerTreatments
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param sampleId Database column sample_id SqlType(SMALLINT UNSIGNED)
-   *  @param batchId Database column batch_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param micromolarDose Database column micromolar_dose SqlType(DOUBLE UNSIGNED)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class BiomarkerTreatmentsRow(id: Int, sampleId: Int, batchId: Int, micromolarDose: Double, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching BiomarkerTreatmentsRow objects using plain SQL queries */
-  implicit def GetResultBiomarkerTreatmentsRow(implicit e0: GR[Int], e1: GR[Double], e2: GR[java.sql.Timestamp]): GR[BiomarkerTreatmentsRow] = GR{
-    prs => import prs._
-    BiomarkerTreatmentsRow.tupled((<<[Int], <<[Int], <<[Int], <<[Double], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table biomarker_treatments. Objects of this class serve as prototypes for rows in queries. */
-  class BiomarkerTreatments(_tableTag: Tag) extends profile.api.Table[BiomarkerTreatmentsRow](_tableTag, Some("valar"), "biomarker_treatments") {
-    def * = (id, sampleId, batchId, micromolarDose, created) <> (BiomarkerTreatmentsRow.tupled, BiomarkerTreatmentsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(sampleId), Rep.Some(batchId), Rep.Some(micromolarDose), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> BiomarkerTreatmentsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column sample_id SqlType(SMALLINT UNSIGNED) */
-    val sampleId: Rep[Int] = column[Int]("sample_id")
-    /** Database column batch_id SqlType(MEDIUMINT UNSIGNED) */
-    val batchId: Rep[Int] = column[Int]("batch_id")
-    /** Database column micromolar_dose SqlType(DOUBLE UNSIGNED) */
-    val micromolarDose: Rep[Double] = column[Double]("micromolar_dose")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing Batches (database name biomarker_treatment_to_batch) */
-    lazy val batchesFk = foreignKey("biomarker_treatment_to_batch", batchId, Batches)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing BiomarkerSamples (database name biomarker_treatment_to_sample) */
-    lazy val biomarkerSamplesFk = foreignKey("biomarker_treatment_to_sample", sampleId, BiomarkerSamples)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-
-    /** Uniqueness Index over (sampleId,batchId) (database name sample_batch_unique) */
-    val index1 = index("sample_batch_unique", (sampleId, batchId), unique=true)
-  }
-  /** Collection-like TableQuery object for table BiomarkerTreatments */
-  lazy val BiomarkerTreatments = new TableQuery(tag => new BiomarkerTreatments(tag))
-
-  /** Entity class storing rows of table CarpProjects
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param description Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param projectTypeId Database column project_type_id SqlType(SMALLINT UNSIGNED)
-   *  @param ancestorId Database column ancestor_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param ownerId Database column owner_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param modified Database column modified SqlType(TIMESTAMP)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpProjectsRow(id: Int, name: String, description: Option[String] = None, projectTypeId: Int, ancestorId: Option[Int] = None, ownerId: Option[Int] = None, modified: java.sql.Timestamp, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpProjectsRow objects using plain SQL queries */
-  implicit def GetResultCarpProjectsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Int]], e4: GR[java.sql.Timestamp]): GR[CarpProjectsRow] = GR{
-    prs => import prs._
-    CarpProjectsRow.tupled((<<[Int], <<[String], <<?[String], <<[Int], <<?[Int], <<?[Int], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_projects. Objects of this class serve as prototypes for rows in queries. */
-  class CarpProjects(_tableTag: Tag) extends profile.api.Table[CarpProjectsRow](_tableTag, Some("valar"), "carp_projects") {
-    def * = (id, name, description, projectTypeId, ancestorId, ownerId, modified, created) <> (CarpProjectsRow.tupled, CarpProjectsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), description, Rep.Some(projectTypeId), ancestorId, ownerId, Rep.Some(modified), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpProjectsRow.tupled((_1.get, _2.get, _3, _4.get, _5, _6, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column project_type_id SqlType(SMALLINT UNSIGNED) */
-    val projectTypeId: Rep[Int] = column[Int]("project_type_id")
-    /** Database column ancestor_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val ancestorId: Rep[Option[Int]] = column[Option[Int]]("ancestor_id", O.Default(None))
-    /** Database column owner_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val ownerId: Rep[Option[Int]] = column[Option[Int]]("owner_id", O.Default(None))
-    /** Database column modified SqlType(TIMESTAMP) */
-    val modified: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("modified")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing CarpProjectTypes (database name carp_project_to_type) */
-    lazy val carpProjectTypesFk = foreignKey("carp_project_to_type", projectTypeId, CarpProjectTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing CarpProjects (database name to_ancestor) */
-    lazy val carpProjectsFk = foreignKey("to_ancestor", ancestorId, CarpProjects)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.SetNull)
-    /** Foreign key referencing Users (database name carp_project_to_user) */
-    lazy val usersFk = foreignKey("carp_project_to_user", ownerId, Users)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (name) (database name name_unique) */
-    val index1 = index("name_unique", name, unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpProjects */
-  lazy val CarpProjects = new TableQuery(tag => new CarpProjects(tag))
-
-  /** Entity class storing rows of table CarpProjectTypes
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param description Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param baseType Database column base_type SqlType(ENUM), Length(19,false) */
-  case class CarpProjectTypesRow(id: Int, name: String, description: Option[String] = None, baseType: String)
-  /** GetResult implicit for fetching CarpProjectTypesRow objects using plain SQL queries */
-  implicit def GetResultCarpProjectTypesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[CarpProjectTypesRow] = GR{
-    prs => import prs._
-    CarpProjectTypesRow.tupled((<<[Int], <<[String], <<?[String], <<[String]))
-  }
-  /** Table description of table carp_project_types. Objects of this class serve as prototypes for rows in queries. */
-  class CarpProjectTypes(_tableTag: Tag) extends profile.api.Table[CarpProjectTypesRow](_tableTag, Some("valar"), "carp_project_types") {
-    def * = (id, name, description, baseType) <> (CarpProjectTypesRow.tupled, CarpProjectTypesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), description, Rep.Some(baseType)).shaped.<>({r=>import r._; _1.map(_=> CarpProjectTypesRow.tupled((_1.get, _2.get, _3, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column base_type SqlType(ENUM), Length(19,false) */
-    val baseType: Rep[String] = column[String]("base_type", O.Length(19,varying=false))
-
-    /** Uniqueness Index over (name) (database name name_unique) */
-    val index1 = index("name_unique", name, unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpProjectTypes */
-  lazy val CarpProjectTypes = new TableQuery(tag => new CarpProjectTypes(tag))
-
-  /** Entity class storing rows of table CarpScans
-   *  @param id Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey
-   *  @param tankId Database column tank_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param scanType Database column scan_type SqlType(ENUM), Length(16,false)
-   *  @param scanValue Database column scan_value SqlType(VARCHAR), Length(250,true), Default()
-   *  @param personScannedId Database column person_scanned_id SqlType(SMALLINT UNSIGNED)
-   *  @param datetimeScanned Database column datetime_scanned SqlType(DATETIME)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpScansRow(id: Int, tankId: Int, scanType: String, scanValue: String = "", personScannedId: Int, datetimeScanned: java.sql.Timestamp, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpScansRow objects using plain SQL queries */
-  implicit def GetResultCarpScansRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[CarpScansRow] = GR{
-    prs => import prs._
-    CarpScansRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<[Int], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_scans. Objects of this class serve as prototypes for rows in queries. */
-  class CarpScans(_tableTag: Tag) extends profile.api.Table[CarpScansRow](_tableTag, Some("valar"), "carp_scans") {
-    def * = (id, tankId, scanType, scanValue, personScannedId, datetimeScanned, created) <> (CarpScansRow.tupled, CarpScansRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(tankId), Rep.Some(scanType), Rep.Some(scanValue), Rep.Some(personScannedId), Rep.Some(datetimeScanned), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpScansRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column tank_id SqlType(MEDIUMINT UNSIGNED) */
-    val tankId: Rep[Int] = column[Int]("tank_id")
-    /** Database column scan_type SqlType(ENUM), Length(16,false) */
-    val scanType: Rep[String] = column[String]("scan_type", O.Length(16,varying=false))
-    /** Database column scan_value SqlType(VARCHAR), Length(250,true), Default() */
-    val scanValue: Rep[String] = column[String]("scan_value", O.Length(250,varying=true), O.Default(""))
-    /** Database column person_scanned_id SqlType(SMALLINT UNSIGNED) */
-    val personScannedId: Rep[Int] = column[Int]("person_scanned_id")
-    /** Database column datetime_scanned SqlType(DATETIME) */
-    val datetimeScanned: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("datetime_scanned")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing CarpTanks (database name scan_to_tank) */
-    lazy val carpTanksFk = foreignKey("scan_to_tank", tankId, CarpTanks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing Users (database name scan_to_user) */
-    lazy val usersFk = foreignKey("scan_to_user", personScannedId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Index over (datetimeScanned) (database name datetime_scanned) */
-    val index1 = index("datetime_scanned", datetimeScanned)
-    /** Index over (scanType) (database name scan_type) */
-    val index2 = index("scan_type", scanType)
-    /** Index over (scanValue) (database name scan_value) */
-    val index3 = index("scan_value", scanValue)
-    /** Uniqueness Index over (tankId,scanType,datetimeScanned) (database name tank_datetime_type_unique) */
-    val index4 = index("tank_datetime_type_unique", (tankId, scanType, datetimeScanned), unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpScans */
-  lazy val CarpScans = new TableQuery(tag => new CarpScans(tag))
-
-  /** Entity class storing rows of table CarpSystemData
-   *  @param id Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
-   *  @param value Database column value SqlType(VARCHAR), Length(255,true)
-   *  @param datetimeScanned Database column datetime_scanned SqlType(DATETIME)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpSystemDataRow(id: Int, name: String, value: String, datetimeScanned: java.sql.Timestamp, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpSystemDataRow objects using plain SQL queries */
-  implicit def GetResultCarpSystemDataRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[CarpSystemDataRow] = GR{
-    prs => import prs._
-    CarpSystemDataRow.tupled((<<[Int], <<[String], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_system_data. Objects of this class serve as prototypes for rows in queries. */
-  class CarpSystemData(_tableTag: Tag) extends profile.api.Table[CarpSystemDataRow](_tableTag, Some("valar"), "carp_system_data") {
-    def * = (id, name, value, datetimeScanned, created) <> (CarpSystemDataRow.tupled, CarpSystemDataRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(value), Rep.Some(datetimeScanned), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpSystemDataRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(255,true) */
-    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
-    /** Database column value SqlType(VARCHAR), Length(255,true) */
-    val value: Rep[String] = column[String]("value", O.Length(255,varying=true))
-    /** Database column datetime_scanned SqlType(DATETIME) */
-    val datetimeScanned: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("datetime_scanned")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Uniqueness Index over (name,datetimeScanned) (database name name_datetime_scanned_unique) */
-    val index1 = index("name_datetime_scanned_unique", (name, datetimeScanned), unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpSystemData */
-  lazy val CarpSystemData = new TableQuery(tag => new CarpSystemData(tag))
-
-  /** Entity class storing rows of table CarpTanks
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param internalId Database column internal_id SqlType(VARCHAR), Length(12,true)
-   *  @param projectId Database column project_id SqlType(SMALLINT UNSIGNED)
-   *  @param variantId Database column variant_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param tankTypeId Database column tank_type_id SqlType(SMALLINT UNSIGNED)
-   *  @param birthdate Database column birthdate SqlType(DATE)
-   *  @param alive Database column alive SqlType(BIT), Default(true)
-   *  @param notes Database column notes SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpTanksRow(id: Int, internalId: String, projectId: Int, variantId: Int, tankTypeId: Int, birthdate: java.sql.Date, alive: Boolean = true, notes: Option[String] = None, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpTanksRow objects using plain SQL queries */
-  implicit def GetResultCarpTanksRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Date], e3: GR[Boolean], e4: GR[Option[String]], e5: GR[java.sql.Timestamp]): GR[CarpTanksRow] = GR{
-    prs => import prs._
-    CarpTanksRow.tupled((<<[Int], <<[String], <<[Int], <<[Int], <<[Int], <<[java.sql.Date], <<[Boolean], <<?[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_tanks. Objects of this class serve as prototypes for rows in queries. */
-  class CarpTanks(_tableTag: Tag) extends profile.api.Table[CarpTanksRow](_tableTag, Some("valar"), "carp_tanks") {
-    def * = (id, internalId, projectId, variantId, tankTypeId, birthdate, alive, notes, created) <> (CarpTanksRow.tupled, CarpTanksRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(internalId), Rep.Some(projectId), Rep.Some(variantId), Rep.Some(tankTypeId), Rep.Some(birthdate), Rep.Some(alive), notes, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpTanksRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column internal_id SqlType(VARCHAR), Length(12,true) */
-    val internalId: Rep[String] = column[String]("internal_id", O.Length(12,varying=true))
-    /** Database column project_id SqlType(SMALLINT UNSIGNED) */
-    val projectId: Rep[Int] = column[Int]("project_id")
-    /** Database column variant_id SqlType(MEDIUMINT UNSIGNED) */
-    val variantId: Rep[Int] = column[Int]("variant_id")
-    /** Database column tank_type_id SqlType(SMALLINT UNSIGNED) */
-    val tankTypeId: Rep[Int] = column[Int]("tank_type_id")
-    /** Database column birthdate SqlType(DATE) */
-    val birthdate: Rep[java.sql.Date] = column[java.sql.Date]("birthdate")
-    /** Database column alive SqlType(BIT), Default(true) */
-    val alive: Rep[Boolean] = column[Boolean]("alive", O.Default(true))
-    /** Database column notes SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val notes: Rep[Option[String]] = column[Option[String]]("notes", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing CarpProjects (database name tank_to_project) */
-    lazy val carpProjectsFk = foreignKey("tank_to_project", projectId, CarpProjects)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing CarpTankTypes (database name carp_tank_to_tank_type) */
-    lazy val carpTankTypesFk = foreignKey("carp_tank_to_tank_type", tankTypeId, CarpTankTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing GeneticVariants (database name carp_tank_to_fish_variant) */
-    lazy val geneticVariantsFk = foreignKey("carp_tank_to_fish_variant", variantId, GeneticVariants)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Index over (birthdate) (database name birthdate) */
-    val index1 = index("birthdate", birthdate)
-    /** Uniqueness Index over (internalId) (database name internal_id_unique) */
-    val index2 = index("internal_id_unique", internalId, unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpTanks */
-  lazy val CarpTanks = new TableQuery(tag => new CarpTanks(tag))
-
-  /** Entity class storing rows of table CarpTankTasks
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param tankId Database column tank_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param taskId Database column task_id SqlType(SMALLINT UNSIGNED)
-   *  @param notes Database column notes SqlType(VARCHAR), Length(250,true), Default()
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpTankTasksRow(id: Int, tankId: Int, taskId: Int, notes: String = "", created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpTankTasksRow objects using plain SQL queries */
-  implicit def GetResultCarpTankTasksRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[CarpTankTasksRow] = GR{
-    prs => import prs._
-    CarpTankTasksRow.tupled((<<[Int], <<[Int], <<[Int], <<[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_tank_tasks. Objects of this class serve as prototypes for rows in queries. */
-  class CarpTankTasks(_tableTag: Tag) extends profile.api.Table[CarpTankTasksRow](_tableTag, Some("valar"), "carp_tank_tasks") {
-    def * = (id, tankId, taskId, notes, created) <> (CarpTankTasksRow.tupled, CarpTankTasksRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(tankId), Rep.Some(taskId), Rep.Some(notes), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpTankTasksRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column tank_id SqlType(MEDIUMINT UNSIGNED) */
-    val tankId: Rep[Int] = column[Int]("tank_id")
-    /** Database column task_id SqlType(SMALLINT UNSIGNED) */
-    val taskId: Rep[Int] = column[Int]("task_id")
-    /** Database column notes SqlType(VARCHAR), Length(250,true), Default() */
-    val notes: Rep[String] = column[String]("notes", O.Length(250,varying=true), O.Default(""))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing CarpTanks (database name tank_history_to_tank) */
-    lazy val carpTanksFk = foreignKey("tank_history_to_tank", tankId, CarpTanks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing CarpTasks (database name tank_history_to_task) */
-    lazy val carpTasksFk = foreignKey("tank_history_to_task", taskId, CarpTasks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-  }
-  /** Collection-like TableQuery object for table CarpTankTasks */
-  lazy val CarpTankTasks = new TableQuery(tag => new CarpTankTasks(tag))
-
-  /** Entity class storing rows of table CarpTankTypes
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param projectTypeId Database column project_type_id SqlType(SMALLINT UNSIGNED)
-   *  @param description Database column description SqlType(VARCHAR), Length(255,true)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class CarpTankTypesRow(id: Int, name: String, projectTypeId: Int, description: String, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching CarpTankTypesRow objects using plain SQL queries */
-  implicit def GetResultCarpTankTypesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[CarpTankTypesRow] = GR{
-    prs => import prs._
-    CarpTankTypesRow.tupled((<<[Int], <<[String], <<[Int], <<[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table carp_tank_types. Objects of this class serve as prototypes for rows in queries. */
-  class CarpTankTypes(_tableTag: Tag) extends profile.api.Table[CarpTankTypesRow](_tableTag, Some("valar"), "carp_tank_types") {
-    def * = (id, name, projectTypeId, description, created) <> (CarpTankTypesRow.tupled, CarpTankTypesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(projectTypeId), Rep.Some(description), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> CarpTankTypesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column project_type_id SqlType(SMALLINT UNSIGNED) */
-    val projectTypeId: Rep[Int] = column[Int]("project_type_id")
-    /** Database column description SqlType(VARCHAR), Length(255,true) */
-    val description: Rep[String] = column[String]("description", O.Length(255,varying=true))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing CarpProjectTypes (database name carp_tank_type_to_project_type) */
-    lazy val carpProjectTypesFk = foreignKey("carp_tank_type_to_project_type", projectTypeId, CarpProjectTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-
-    /** Uniqueness Index over (name) (database name name_unique) */
-    val index1 = index("name_unique", name, unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpTankTypes */
-  lazy val CarpTankTypes = new TableQuery(tag => new CarpTankTypes(tag))
-
-  /** Entity class storing rows of table CarpTasks
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param projectType Database column project_type SqlType(SMALLINT UNSIGNED)
-   *  @param tankTypeId Database column tank_type_id SqlType(SMALLINT UNSIGNED)
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param description Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param failureTargetId Database column failure_target_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param successTargetId Database column success_target_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param successCondition Database column success_condition SqlType(VARCHAR), Length(250,true), Default(None)
-   *  @param failureCondition Database column failure_condition SqlType(VARCHAR), Length(250,true), Default(None)
-   *  @param minAgeDays Database column min_age_days SqlType(INT UNSIGNED), Default(None)
-   *  @param notes Database column notes SqlType(TEXT), Default(None) */
-  case class CarpTasksRow(id: Int, projectType: Int, tankTypeId: Int, name: String, description: Option[String] = None, failureTargetId: Option[Int] = None, successTargetId: Option[Int] = None, successCondition: Option[String] = None, failureCondition: Option[String] = None, minAgeDays: Option[Int] = None, notes: Option[String] = None)
-  /** GetResult implicit for fetching CarpTasksRow objects using plain SQL queries */
-  implicit def GetResultCarpTasksRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Int]]): GR[CarpTasksRow] = GR{
-    prs => import prs._
-    CarpTasksRow.tupled((<<[Int], <<[Int], <<[Int], <<[String], <<?[String], <<?[Int], <<?[Int], <<?[String], <<?[String], <<?[Int], <<?[String]))
-  }
-  /** Table description of table carp_tasks. Objects of this class serve as prototypes for rows in queries. */
-  class CarpTasks(_tableTag: Tag) extends profile.api.Table[CarpTasksRow](_tableTag, Some("valar"), "carp_tasks") {
-    def * = (id, projectType, tankTypeId, name, description, failureTargetId, successTargetId, successCondition, failureCondition, minAgeDays, notes) <> (CarpTasksRow.tupled, CarpTasksRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(projectType), Rep.Some(tankTypeId), Rep.Some(name), description, failureTargetId, successTargetId, successCondition, failureCondition, minAgeDays, notes).shaped.<>({r=>import r._; _1.map(_=> CarpTasksRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6, _7, _8, _9, _10, _11)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column project_type SqlType(SMALLINT UNSIGNED) */
-    val projectType: Rep[Int] = column[Int]("project_type")
-    /** Database column tank_type_id SqlType(SMALLINT UNSIGNED) */
-    val tankTypeId: Rep[Int] = column[Int]("tank_type_id")
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column failure_target_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val failureTargetId: Rep[Option[Int]] = column[Option[Int]]("failure_target_id", O.Default(None))
-    /** Database column success_target_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val successTargetId: Rep[Option[Int]] = column[Option[Int]]("success_target_id", O.Default(None))
-    /** Database column success_condition SqlType(VARCHAR), Length(250,true), Default(None) */
-    val successCondition: Rep[Option[String]] = column[Option[String]]("success_condition", O.Length(250,varying=true), O.Default(None))
-    /** Database column failure_condition SqlType(VARCHAR), Length(250,true), Default(None) */
-    val failureCondition: Rep[Option[String]] = column[Option[String]]("failure_condition", O.Length(250,varying=true), O.Default(None))
-    /** Database column min_age_days SqlType(INT UNSIGNED), Default(None) */
-    val minAgeDays: Rep[Option[Int]] = column[Option[Int]]("min_age_days", O.Default(None))
-    /** Database column notes SqlType(TEXT), Default(None) */
-    val notes: Rep[Option[String]] = column[Option[String]]("notes", O.Default(None))
-
-    /** Foreign key referencing CarpProjectTypes (database name carp_task_to_project_type) */
-    lazy val carpProjectTypesFk = foreignKey("carp_task_to_project_type", projectType, CarpProjectTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing CarpTankTypes (database name carp_task_to_tank_type) */
-    lazy val carpTankTypesFk = foreignKey("carp_task_to_tank_type", tankTypeId, CarpTankTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing CarpTasks (database name carp_task_to_failure) */
-    lazy val carpTasksFk3 = foreignKey("carp_task_to_failure", failureTargetId, CarpTasks)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing CarpTasks (database name carp_task_to_success) */
-    lazy val carpTasksFk4 = foreignKey("carp_task_to_success", successTargetId, CarpTasks)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Index over (name) (database name name) */
-    val index1 = index("name", name)
-    /** Uniqueness Index over (name,projectType) (database name name_project_type_unique) */
-    val index2 = index("name_project_type_unique", (name, projectType), unique=true)
-  }
-  /** Collection-like TableQuery object for table CarpTasks */
-  lazy val CarpTasks = new TableQuery(tag => new CarpTasks(tag))
-
-  /** Entity class storing rows of table ComponentChecks
-   *  @param id Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
-   *  @param sensorId Database column sensor_id SqlType(TINYINT UNSIGNED)
-   *  @param stimulusId Database column stimulus_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param sauronConfigId Database column sauron_config_id SqlType(SMALLINT UNSIGNED)
-   *  @param datetimeScanned Database column datetime_scanned SqlType(DATETIME)
-   *  @param value Database column value SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param data Database column data SqlType(MEDIUMBLOB), Default(None)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class ComponentChecksRow(id: Int, name: String, sensorId: Byte, stimulusId: Option[Int] = None, sauronConfigId: Int, datetimeScanned: java.sql.Timestamp, value: Option[String] = None, data: Option[java.sql.Blob] = None, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching ComponentChecksRow objects using plain SQL queries */
-  implicit def GetResultComponentChecksRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Byte], e3: GR[Option[Int]], e4: GR[java.sql.Timestamp], e5: GR[Option[String]], e6: GR[Option[java.sql.Blob]]): GR[ComponentChecksRow] = GR{
-    prs => import prs._
-    ComponentChecksRow.tupled((<<[Int], <<[String], <<[Byte], <<?[Int], <<[Int], <<[java.sql.Timestamp], <<?[String], <<?[java.sql.Blob], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table component_checks. Objects of this class serve as prototypes for rows in queries. */
-  class ComponentChecks(_tableTag: Tag) extends profile.api.Table[ComponentChecksRow](_tableTag, Some("valar"), "component_checks") {
-    def * = (id, name, sensorId, stimulusId, sauronConfigId, datetimeScanned, value, data, created) <> (ComponentChecksRow.tupled, ComponentChecksRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(sensorId), stimulusId, Rep.Some(sauronConfigId), Rep.Some(datetimeScanned), value, data, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> ComponentChecksRow.tupled((_1.get, _2.get, _3.get, _4, _5.get, _6.get, _7, _8, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(255,true) */
-    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
-    /** Database column sensor_id SqlType(TINYINT UNSIGNED) */
-    val sensorId: Rep[Byte] = column[Byte]("sensor_id")
-    /** Database column stimulus_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val stimulusId: Rep[Option[Int]] = column[Option[Int]]("stimulus_id", O.Default(None))
-    /** Database column sauron_config_id SqlType(SMALLINT UNSIGNED) */
-    val sauronConfigId: Rep[Int] = column[Int]("sauron_config_id")
-    /** Database column datetime_scanned SqlType(DATETIME) */
-    val datetimeScanned: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("datetime_scanned")
-    /** Database column value SqlType(VARCHAR), Length(255,true), Default(None) */
-    val value: Rep[Option[String]] = column[Option[String]]("value", O.Length(255,varying=true), O.Default(None))
-    /** Database column data SqlType(MEDIUMBLOB), Default(None) */
-    val data: Rep[Option[java.sql.Blob]] = column[Option[java.sql.Blob]]("data", O.Default(None))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing SauronConfigs (database name component_check_to_sauron_config) */
-    lazy val sauronConfigsFk = foreignKey("component_check_to_sauron_config", sauronConfigId, SauronConfigs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Sensors (database name component_check_to_sensor) */
-    lazy val sensorsFk = foreignKey("component_check_to_sensor", sensorId, Sensors)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Stimuli (database name component_check_to_stimulus) */
-    lazy val stimuliFk = foreignKey("component_check_to_stimulus", stimulusId, Stimuli)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-  }
-  /** Collection-like TableQuery object for table ComponentChecks */
-  lazy val ComponentChecks = new TableQuery(tag => new ComponentChecks(tag))
 
   /** Entity class storing rows of table CompoundLabels
    *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
@@ -1343,10 +684,10 @@ trait Tables {
     /** Database column created SqlType(TIMESTAMP) */
     val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
 
-    /** Foreign key referencing Batteries (database name project_to_protocol) */
-    lazy val batteriesFk = foreignKey("project_to_protocol", batteryId, Batteries)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Superprojects (database name project_to_superproject) */
-    lazy val superprojectsFk = foreignKey("project_to_superproject", projectId, Superprojects)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
+    /** Foreign key referencing Batteries (database name project_to_battery) */
+    lazy val batteriesFk = foreignKey("project_to_battery", batteryId, Batteries)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Projects (database name project_to_project) */
+    lazy val projectsFk = foreignKey("project_to_project", projectId, Projects)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
     /** Foreign key referencing TemplatePlates (database name project_to_template_plate) */
     lazy val templatePlatesFk = foreignKey("project_to_template_plate", templatePlateId, TemplatePlates)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
     /** Foreign key referencing TransferPlates (database name experiment_to_transfer_plate) */
@@ -1397,331 +738,6 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Features */
   lazy val Features = new TableQuery(tag => new Features(tag))
-
-  /** Entity class storing rows of table GeneLabels
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param geneId Database column gene_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param name Database column name SqlType(VARCHAR), Length(255,true)
-   *  @param refId Database column ref_id SqlType(SMALLINT UNSIGNED)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class GeneLabelsRow(id: Int, geneId: Int, name: String, refId: Int, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching GeneLabelsRow objects using plain SQL queries */
-  implicit def GetResultGeneLabelsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[GeneLabelsRow] = GR{
-    prs => import prs._
-    GeneLabelsRow.tupled((<<[Int], <<[Int], <<[String], <<[Int], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table gene_labels. Objects of this class serve as prototypes for rows in queries. */
-  class GeneLabels(_tableTag: Tag) extends profile.api.Table[GeneLabelsRow](_tableTag, Some("valar"), "gene_labels") {
-    def * = (id, geneId, name, refId, created) <> (GeneLabelsRow.tupled, GeneLabelsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(geneId), Rep.Some(name), Rep.Some(refId), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> GeneLabelsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column gene_id SqlType(MEDIUMINT UNSIGNED) */
-    val geneId: Rep[Int] = column[Int]("gene_id")
-    /** Database column name SqlType(VARCHAR), Length(255,true) */
-    val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
-    /** Database column ref_id SqlType(SMALLINT UNSIGNED) */
-    val refId: Rep[Int] = column[Int]("ref_id")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing Genes (database name gene_name_to_gene) */
-    lazy val genesFk = foreignKey("gene_name_to_gene", geneId, Genes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-    /** Foreign key referencing Refs (database name gene_name_to_source) */
-    lazy val refsFk = foreignKey("gene_name_to_source", refId, Refs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Index over (name) (database name name) */
-    val index1 = index("name", name)
-    /** Uniqueness Index over (geneId,name,refId) (database name name_gene_source_unique) */
-    val index2 = index("name_gene_source_unique", (geneId, name, refId), unique=true)
-  }
-  /** Collection-like TableQuery object for table GeneLabels */
-  lazy val GeneLabels = new TableQuery(tag => new GeneLabels(tag))
-
-  /** Entity class storing rows of table Genes
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param name Database column name SqlType(VARCHAR), Length(30,true), Default(None)
-   *  @param pubLink Database column pub_link SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param description Database column description SqlType(VARCHAR), Length(250,true), Default(None)
-   *  @param sequence Database column sequence SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class GenesRow(id: Int, name: Option[String] = None, pubLink: Option[String] = None, description: Option[String] = None, sequence: Option[String] = None, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching GenesRow objects using plain SQL queries */
-  implicit def GetResultGenesRow(implicit e0: GR[Int], e1: GR[Option[String]], e2: GR[java.sql.Timestamp]): GR[GenesRow] = GR{
-    prs => import prs._
-    GenesRow.tupled((<<[Int], <<?[String], <<?[String], <<?[String], <<?[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table genes. Objects of this class serve as prototypes for rows in queries. */
-  class Genes(_tableTag: Tag) extends profile.api.Table[GenesRow](_tableTag, Some("valar"), "genes") {
-    def * = (id, name, pubLink, description, sequence, created) <> (GenesRow.tupled, GenesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), name, pubLink, description, sequence, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> GenesRow.tupled((_1.get, _2, _3, _4, _5, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column name SqlType(VARCHAR), Length(30,true), Default(None) */
-    val name: Rep[Option[String]] = column[Option[String]]("name", O.Length(30,varying=true), O.Default(None))
-    /** Database column pub_link SqlType(VARCHAR), Length(255,true), Default(None) */
-    val pubLink: Rep[Option[String]] = column[Option[String]]("pub_link", O.Length(255,varying=true), O.Default(None))
-    /** Database column description SqlType(VARCHAR), Length(250,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(250,varying=true), O.Default(None))
-    /** Database column sequence SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val sequence: Rep[Option[String]] = column[Option[String]]("sequence", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Index over (name) (database name name) */
-    val index1 = index("name", name)
-    /** Index over (pubLink) (database name pub_link) */
-    val index2 = index("pub_link", pubLink)
-  }
-  /** Collection-like TableQuery object for table Genes */
-  lazy val Genes = new TableQuery(tag => new Genes(tag))
-
-  /** Entity class storing rows of table GeneticConstructFeatures
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param kind Database column kind SqlType(VARCHAR), Length(50,true)
-   *  @param name Database column name SqlType(VARCHAR), Length(250,true)
-   *  @param geneId Database column gene_id SqlType(MEDIUMINT UNSIGNED), Default(None)
-   *  @param constructId Database column construct_id SqlType(SMALLINT UNSIGNED)
-   *  @param start Database column start SqlType(BIGINT), Default(None)
-   *  @param end Database column end SqlType(BIGINT), Default(None)
-   *  @param isComplement Database column is_complement SqlType(BIT), Default(None) */
-  case class GeneticConstructFeaturesRow(id: Int, kind: String, name: String, geneId: Option[Int] = None, constructId: Int, start: Option[Long] = None, end: Option[Long] = None, isComplement: Option[Boolean] = None)
-  /** GetResult implicit for fetching GeneticConstructFeaturesRow objects using plain SQL queries */
-  implicit def GetResultGeneticConstructFeaturesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Int]], e3: GR[Option[Long]], e4: GR[Option[Boolean]]): GR[GeneticConstructFeaturesRow] = GR{
-    prs => import prs._
-    GeneticConstructFeaturesRow.tupled((<<[Int], <<[String], <<[String], <<?[Int], <<[Int], <<?[Long], <<?[Long], <<?[Boolean]))
-  }
-  /** Table description of table genetic_construct_features. Objects of this class serve as prototypes for rows in queries. */
-  class GeneticConstructFeatures(_tableTag: Tag) extends profile.api.Table[GeneticConstructFeaturesRow](_tableTag, Some("valar"), "genetic_construct_features") {
-    def * = (id, kind, name, geneId, constructId, start, end, isComplement) <> (GeneticConstructFeaturesRow.tupled, GeneticConstructFeaturesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(kind), Rep.Some(name), geneId, Rep.Some(constructId), start, end, isComplement).shaped.<>({r=>import r._; _1.map(_=> GeneticConstructFeaturesRow.tupled((_1.get, _2.get, _3.get, _4, _5.get, _6, _7, _8)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column kind SqlType(VARCHAR), Length(50,true) */
-    val kind: Rep[String] = column[String]("kind", O.Length(50,varying=true))
-    /** Database column name SqlType(VARCHAR), Length(250,true) */
-    val name: Rep[String] = column[String]("name", O.Length(250,varying=true))
-    /** Database column gene_id SqlType(MEDIUMINT UNSIGNED), Default(None) */
-    val geneId: Rep[Option[Int]] = column[Option[Int]]("gene_id", O.Default(None))
-    /** Database column construct_id SqlType(SMALLINT UNSIGNED) */
-    val constructId: Rep[Int] = column[Int]("construct_id")
-    /** Database column start SqlType(BIGINT), Default(None) */
-    val start: Rep[Option[Long]] = column[Option[Long]]("start", O.Default(None))
-    /** Database column end SqlType(BIGINT), Default(None) */
-    val end: Rep[Option[Long]] = column[Option[Long]]("end", O.Default(None))
-    /** Database column is_complement SqlType(BIT), Default(None) */
-    val isComplement: Rep[Option[Boolean]] = column[Option[Boolean]]("is_complement", O.Default(None))
-
-    /** Foreign key referencing Genes (database name to_gene) */
-    lazy val genesFk = foreignKey("to_gene", geneId, Genes)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing GeneticConstructs (database name to_construct) */
-    lazy val geneticConstructsFk = foreignKey("to_construct", constructId, GeneticConstructs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-
-    /** Uniqueness Index over (geneId,constructId) (database name gene_construct_unique) */
-    val index1 = index("gene_construct_unique", (geneId, constructId), unique=true)
-  }
-  /** Collection-like TableQuery object for table GeneticConstructFeatures */
-  lazy val GeneticConstructFeatures = new TableQuery(tag => new GeneticConstructFeatures(tag))
-
-  /** Entity class storing rows of table GeneticConstructs
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param kind Database column kind SqlType(ENUM), Length(10,false)
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param locationId Database column location_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param boxNumber Database column box_number SqlType(SMALLINT UNSIGNED)
-   *  @param tubeNumber Database column tube_number SqlType(SMALLINT UNSIGNED)
-   *  @param description Database column description SqlType(VARCHAR), Length(250,true)
-   *  @param supplierId Database column supplier_id SqlType(SMALLINT UNSIGNED), Default(None)
-   *  @param refId Database column ref_id SqlType(SMALLINT UNSIGNED)
-   *  @param pmid Database column pmid SqlType(VARCHAR), Length(30,true), Default(None)
-   *  @param pubLink Database column pub_link SqlType(VARCHAR), Length(150,true), Default(None)
-   *  @param creatorId Database column creator_id SqlType(SMALLINT UNSIGNED)
-   *  @param dateMade Database column date_made SqlType(DATETIME), Default(None)
-   *  @param selectionMarker Database column selection_marker SqlType(VARCHAR), Length(50,true), Default(None)
-   *  @param bacterialStrain Database column bacterial_strain SqlType(VARCHAR), Length(50,true), Default(None)
-   *  @param vector Database column vector SqlType(VARCHAR), Length(50,true), Default(None)
-   *  @param rawFile Database column raw_file SqlType(BLOB), Default(None)
-   *  @param rawFileSha1 Database column raw_file_sha1 SqlType(BINARY), Default(None)
-   *  @param notes Database column notes SqlType(TEXT), Default(None)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class GeneticConstructsRow(id: Int, kind: String, name: String, locationId: Option[Int] = None, boxNumber: Int, tubeNumber: Int, description: String, supplierId: Option[Int] = None, refId: Int, pmid: Option[String] = None, pubLink: Option[String] = None, creatorId: Int, dateMade: Option[java.sql.Timestamp] = None, selectionMarker: Option[String] = None, bacterialStrain: Option[String] = None, vector: Option[String] = None, rawFile: Option[java.sql.Blob] = None, rawFileSha1: Option[java.sql.Blob] = None, notes: Option[String] = None, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching GeneticConstructsRow objects using plain SQL queries */
-  implicit def GetResultGeneticConstructsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Int]], e3: GR[Option[String]], e4: GR[Option[java.sql.Timestamp]], e5: GR[Option[java.sql.Blob]], e6: GR[java.sql.Timestamp]): GR[GeneticConstructsRow] = GR{
-    prs => import prs._
-    GeneticConstructsRow.tupled((<<[Int], <<[String], <<[String], <<?[Int], <<[Int], <<[Int], <<[String], <<?[Int], <<[Int], <<?[String], <<?[String], <<[Int], <<?[java.sql.Timestamp], <<?[String], <<?[String], <<?[String], <<?[java.sql.Blob], <<?[java.sql.Blob], <<?[String], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table genetic_constructs. Objects of this class serve as prototypes for rows in queries. */
-  class GeneticConstructs(_tableTag: Tag) extends profile.api.Table[GeneticConstructsRow](_tableTag, Some("valar"), "genetic_constructs") {
-    def * = (id, kind, name, locationId, boxNumber, tubeNumber, description, supplierId, refId, pmid, pubLink, creatorId, dateMade, selectionMarker, bacterialStrain, vector, rawFile, rawFileSha1, notes, created) <> (GeneticConstructsRow.tupled, GeneticConstructsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(kind), Rep.Some(name), locationId, Rep.Some(boxNumber), Rep.Some(tubeNumber), Rep.Some(description), supplierId, Rep.Some(refId), pmid, pubLink, Rep.Some(creatorId), dateMade, selectionMarker, bacterialStrain, vector, rawFile, rawFileSha1, notes, Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> GeneticConstructsRow.tupled((_1.get, _2.get, _3.get, _4, _5.get, _6.get, _7.get, _8, _9.get, _10, _11, _12.get, _13, _14, _15, _16, _17, _18, _19, _20.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column kind SqlType(ENUM), Length(10,false) */
-    val kind: Rep[String] = column[String]("kind", O.Length(10,varying=false))
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column location_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val locationId: Rep[Option[Int]] = column[Option[Int]]("location_id", O.Default(None))
-    /** Database column box_number SqlType(SMALLINT UNSIGNED) */
-    val boxNumber: Rep[Int] = column[Int]("box_number")
-    /** Database column tube_number SqlType(SMALLINT UNSIGNED) */
-    val tubeNumber: Rep[Int] = column[Int]("tube_number")
-    /** Database column description SqlType(VARCHAR), Length(250,true) */
-    val description: Rep[String] = column[String]("description", O.Length(250,varying=true))
-    /** Database column supplier_id SqlType(SMALLINT UNSIGNED), Default(None) */
-    val supplierId: Rep[Option[Int]] = column[Option[Int]]("supplier_id", O.Default(None))
-    /** Database column ref_id SqlType(SMALLINT UNSIGNED) */
-    val refId: Rep[Int] = column[Int]("ref_id")
-    /** Database column pmid SqlType(VARCHAR), Length(30,true), Default(None) */
-    val pmid: Rep[Option[String]] = column[Option[String]]("pmid", O.Length(30,varying=true), O.Default(None))
-    /** Database column pub_link SqlType(VARCHAR), Length(150,true), Default(None) */
-    val pubLink: Rep[Option[String]] = column[Option[String]]("pub_link", O.Length(150,varying=true), O.Default(None))
-    /** Database column creator_id SqlType(SMALLINT UNSIGNED) */
-    val creatorId: Rep[Int] = column[Int]("creator_id")
-    /** Database column date_made SqlType(DATETIME), Default(None) */
-    val dateMade: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("date_made", O.Default(None))
-    /** Database column selection_marker SqlType(VARCHAR), Length(50,true), Default(None) */
-    val selectionMarker: Rep[Option[String]] = column[Option[String]]("selection_marker", O.Length(50,varying=true), O.Default(None))
-    /** Database column bacterial_strain SqlType(VARCHAR), Length(50,true), Default(None) */
-    val bacterialStrain: Rep[Option[String]] = column[Option[String]]("bacterial_strain", O.Length(50,varying=true), O.Default(None))
-    /** Database column vector SqlType(VARCHAR), Length(50,true), Default(None) */
-    val vector: Rep[Option[String]] = column[Option[String]]("vector", O.Length(50,varying=true), O.Default(None))
-    /** Database column raw_file SqlType(BLOB), Default(None) */
-    val rawFile: Rep[Option[java.sql.Blob]] = column[Option[java.sql.Blob]]("raw_file", O.Default(None))
-    /** Database column raw_file_sha1 SqlType(BINARY), Default(None) */
-    val rawFileSha1: Rep[Option[java.sql.Blob]] = column[Option[java.sql.Blob]]("raw_file_sha1", O.Default(None))
-    /** Database column notes SqlType(TEXT), Default(None) */
-    val notes: Rep[Option[String]] = column[Option[String]]("notes", O.Default(None))
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing Locations (database name genetic_construct_to_location) */
-    lazy val locationsFk = foreignKey("genetic_construct_to_location", locationId, Locations)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Refs (database name genetic_construct_to_ref) */
-    lazy val refsFk = foreignKey("genetic_construct_to_ref", refId, Refs)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Suppliers (database name construct_to_supplier) */
-    lazy val suppliersFk = foreignKey("construct_to_supplier", supplierId, Suppliers)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Users (database name plasmid_to_user) */
-    lazy val usersFk = foreignKey("plasmid_to_user", creatorId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (rawFileSha1) (database name ape_file_sha1_unique) */
-    val index1 = index("ape_file_sha1_unique", rawFileSha1, unique=true)
-    /** Index over (bacterialStrain) (database name bacterial_strain) */
-    val index2 = index("bacterial_strain", bacterialStrain)
-    /** Index over (boxNumber) (database name box_number) */
-    val index3 = index("box_number", boxNumber)
-    /** Uniqueness Index over (boxNumber,tubeNumber) (database name box_tube_unique) */
-    val index4 = index("box_tube_unique", (boxNumber, tubeNumber), unique=true)
-    /** Index over (dateMade) (database name date_made) */
-    val index5 = index("date_made", dateMade)
-    /** Index over (kind) (database name kind) */
-    val index6 = index("kind", kind)
-    /** Uniqueness Index over (name) (database name name_unique) */
-    val index7 = index("name_unique", name, unique=true)
-    /** Index over (pmid) (database name pmid) */
-    val index8 = index("pmid", pmid)
-    /** Index over (rawFileSha1) (database name raw_file_sha1) */
-    val index9 = index("raw_file_sha1", rawFileSha1)
-    /** Index over (tubeNumber) (database name tube_number) */
-    val index10 = index("tube_number", tubeNumber)
-    /** Index over (vector) (database name vector) */
-    val index11 = index("vector", vector)
-  }
-  /** Collection-like TableQuery object for table GeneticConstructs */
-  lazy val GeneticConstructs = new TableQuery(tag => new GeneticConstructs(tag))
-
-  /** Entity class storing rows of table GeneticEvents
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param variantId Database column variant_id SqlType(MEDIUMINT UNSIGNED), Default(None)
-   *  @param endogenousGeneId Database column endogenous_gene_id SqlType(MEDIUMINT UNSIGNED), Default(None)
-   *  @param endogenousGenePosition Database column endogenous_gene_position SqlType(INT), Default(None)
-   *  @param onReverseStrand Database column on_reverse_strand SqlType(BIT), Default(None)
-   *  @param description Database column description SqlType(VARCHAR), Length(250,true), Default(None)
-   *  @param injectionMix Database column injection_mix SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param userId Database column user_id SqlType(SMALLINT UNSIGNED)
-   *  @param created Database column created SqlType(TIMESTAMP) */
-  case class GeneticEventsRow(id: Int, variantId: Option[Int] = None, endogenousGeneId: Option[Int] = None, endogenousGenePosition: Option[Int] = None, onReverseStrand: Option[Boolean] = None, description: Option[String] = None, injectionMix: Option[String] = None, userId: Int, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching GeneticEventsRow objects using plain SQL queries */
-  implicit def GetResultGeneticEventsRow(implicit e0: GR[Int], e1: GR[Option[Int]], e2: GR[Option[Boolean]], e3: GR[Option[String]], e4: GR[java.sql.Timestamp]): GR[GeneticEventsRow] = GR{
-    prs => import prs._
-    GeneticEventsRow.tupled((<<[Int], <<?[Int], <<?[Int], <<?[Int], <<?[Boolean], <<?[String], <<?[String], <<[Int], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table genetic_events. Objects of this class serve as prototypes for rows in queries. */
-  class GeneticEvents(_tableTag: Tag) extends profile.api.Table[GeneticEventsRow](_tableTag, Some("valar"), "genetic_events") {
-    def * = (id, variantId, endogenousGeneId, endogenousGenePosition, onReverseStrand, description, injectionMix, userId, created) <> (GeneticEventsRow.tupled, GeneticEventsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), variantId, endogenousGeneId, endogenousGenePosition, onReverseStrand, description, injectionMix, Rep.Some(userId), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> GeneticEventsRow.tupled((_1.get, _2, _3, _4, _5, _6, _7, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column variant_id SqlType(MEDIUMINT UNSIGNED), Default(None) */
-    val variantId: Rep[Option[Int]] = column[Option[Int]]("variant_id", O.Default(None))
-    /** Database column endogenous_gene_id SqlType(MEDIUMINT UNSIGNED), Default(None) */
-    val endogenousGeneId: Rep[Option[Int]] = column[Option[Int]]("endogenous_gene_id", O.Default(None))
-    /** Database column endogenous_gene_position SqlType(INT), Default(None) */
-    val endogenousGenePosition: Rep[Option[Int]] = column[Option[Int]]("endogenous_gene_position", O.Default(None))
-    /** Database column on_reverse_strand SqlType(BIT), Default(None) */
-    val onReverseStrand: Rep[Option[Boolean]] = column[Option[Boolean]]("on_reverse_strand", O.Default(None))
-    /** Database column description SqlType(VARCHAR), Length(250,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(250,varying=true), O.Default(None))
-    /** Database column injection_mix SqlType(VARCHAR), Length(100,true), Default(None) */
-    val injectionMix: Rep[Option[String]] = column[Option[String]]("injection_mix", O.Length(100,varying=true), O.Default(None))
-    /** Database column user_id SqlType(SMALLINT UNSIGNED) */
-    val userId: Rep[Int] = column[Int]("user_id")
-    /** Database column created SqlType(TIMESTAMP) */
-    val created: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created")
-
-    /** Foreign key referencing Genes (database name mutation_to_endogenous_gene) */
-    lazy val genesFk = foreignKey("mutation_to_endogenous_gene", endogenousGeneId, Genes)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing GeneticVariants (database name mutation_to_fish_variant) */
-    lazy val geneticVariantsFk = foreignKey("mutation_to_fish_variant", variantId, GeneticVariants)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.SetNull)
-    /** Foreign key referencing Users (database name mutation_to_user) */
-    lazy val usersFk = foreignKey("mutation_to_user", userId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-  }
-  /** Collection-like TableQuery object for table GeneticEvents */
-  lazy val GeneticEvents = new TableQuery(tag => new GeneticEvents(tag))
-
-  /** Entity class storing rows of table GeneticKnockins
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param geneId Database column gene_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param eventId Database column event_id SqlType(SMALLINT UNSIGNED) */
-  case class GeneticKnockinsRow(id: Int, geneId: Int, eventId: Int)
-  /** GetResult implicit for fetching GeneticKnockinsRow objects using plain SQL queries */
-  implicit def GetResultGeneticKnockinsRow(implicit e0: GR[Int]): GR[GeneticKnockinsRow] = GR{
-    prs => import prs._
-    GeneticKnockinsRow.tupled((<<[Int], <<[Int], <<[Int]))
-  }
-  /** Table description of table genetic_knockins. Objects of this class serve as prototypes for rows in queries. */
-  class GeneticKnockins(_tableTag: Tag) extends profile.api.Table[GeneticKnockinsRow](_tableTag, Some("valar"), "genetic_knockins") {
-    def * = (id, geneId, eventId) <> (GeneticKnockinsRow.tupled, GeneticKnockinsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(geneId), Rep.Some(eventId)).shaped.<>({r=>import r._; _1.map(_=> GeneticKnockinsRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column gene_id SqlType(MEDIUMINT UNSIGNED) */
-    val geneId: Rep[Int] = column[Int]("gene_id")
-    /** Database column event_id SqlType(SMALLINT UNSIGNED) */
-    val eventId: Rep[Int] = column[Int]("event_id")
-
-    /** Foreign key referencing Genes (database name genes_in_mutations_to_gene) */
-    lazy val genesFk = foreignKey("genes_in_mutations_to_gene", geneId, Genes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing GeneticEvents (database name genes_in_mutations_to_mutation) */
-    lazy val geneticEventsFk = foreignKey("genes_in_mutations_to_mutation", eventId, GeneticEvents)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
-
-    /** Uniqueness Index over (geneId,eventId) (database name gene_mutation_unique) */
-    val index1 = index("gene_mutation_unique", (geneId, eventId), unique=true)
-  }
-  /** Collection-like TableQuery object for table GeneticKnockins */
-  lazy val GeneticKnockins = new TableQuery(tag => new GeneticKnockins(tag))
 
   /** Entity class storing rows of table GeneticVariants
    *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), AutoInc, PrimaryKey
@@ -2906,7 +1922,7 @@ trait Tables {
   /** Entity class storing rows of table SubmissionRecords
    *  @param id Database column id SqlType(INT UNSIGNED), AutoInc, PrimaryKey
    *  @param submissionId Database column submission_id SqlType(MEDIUMINT UNSIGNED)
-   *  @param status Database column status SqlType(ENUM), Length(28,false), Default(None)
+   *  @param status Database column status VARCHAR(100), Length(100,false), Default(None)
    *  @param sauronId Database column sauron_id SqlType(TINYINT UNSIGNED)
    *  @param datetimeModified Database column datetime_modified SqlType(DATETIME)
    *  @param created Database column created SqlType(TIMESTAMP) */
@@ -2927,7 +1943,7 @@ trait Tables {
     /** Database column submission_id SqlType(MEDIUMINT UNSIGNED) */
     val submissionId: Rep[Int] = column[Int]("submission_id")
     /** Database column status SqlType(ENUM), Length(28,false), Default(None) */
-    val status: Rep[Option[String]] = column[Option[String]]("status", O.Length(28,varying=false), O.Default(None))
+    val status: Rep[Option[String]] = column[Option[String]]("status", O.Length(100,varying=false), O.Default(None))
     /** Database column sauron_id SqlType(TINYINT UNSIGNED) */
     val sauronId: Rep[Byte] = column[Byte]("sauron_id")
     /** Database column datetime_modified SqlType(DATETIME) */
@@ -3011,7 +2027,7 @@ trait Tables {
   /** Collection-like TableQuery object for table Submissions */
   lazy val Submissions = new TableQuery(tag => new Submissions(tag))
 
-  /** Entity class storing rows of table Superprojects
+  /** Entity class storing rows of table Projects
    *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(VARCHAR), Length(100,true)
    *  @param typeId Database column type_id SqlType(TINYINT UNSIGNED), Default(None)
@@ -3021,17 +2037,17 @@ trait Tables {
    *  @param methods Database column methods SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
    *  @param active Database column active SqlType(BIT), Default(true)
    *  @param created Database column created SqlType(TIMESTAMP) */
-  case class SuperprojectsRow(id: Int, name: String, typeId: Option[Byte] = None, creatorId: Int, description: Option[String] = None, reason: Option[String] = None, methods: Option[String] = None, active: Boolean = true, created: java.sql.Timestamp)
-  /** GetResult implicit for fetching SuperprojectsRow objects using plain SQL queries */
-  implicit def GetResultSuperprojectsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Byte]], e3: GR[Option[String]], e4: GR[Boolean], e5: GR[java.sql.Timestamp]): GR[SuperprojectsRow] = GR{
+  case class ProjectsRow(id: Int, name: String, typeId: Option[Byte] = None, creatorId: Int, description: Option[String] = None, reason: Option[String] = None, methods: Option[String] = None, active: Boolean = true, created: java.sql.Timestamp)
+  /** GetResult implicit for fetching ProjectsRow objects using plain SQL queries */
+  implicit def GetResultProjectsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Byte]], e3: GR[Option[String]], e4: GR[Boolean], e5: GR[java.sql.Timestamp]): GR[ProjectsRow] = GR{
     prs => import prs._
-    SuperprojectsRow.tupled((<<[Int], <<[String], <<?[Byte], <<[Int], <<?[String], <<?[String], <<?[String], <<[Boolean], <<[java.sql.Timestamp]))
+    ProjectsRow.tupled((<<[Int], <<[String], <<?[Byte], <<[Int], <<?[String], <<?[String], <<?[String], <<[Boolean], <<[java.sql.Timestamp]))
   }
-  /** Table description of table superprojects. Objects of this class serve as prototypes for rows in queries. */
-  class Superprojects(_tableTag: Tag) extends profile.api.Table[SuperprojectsRow](_tableTag, Some("valar"), "superprojects") {
-    def * = (id, name, typeId, creatorId, description, reason, methods, active, created) <> (SuperprojectsRow.tupled, SuperprojectsRow.unapply)
+  /** Table description of table projects. Objects of this class serve as prototypes for rows in queries. */
+  class Projects(_tableTag: Tag) extends profile.api.Table[ProjectsRow](_tableTag, Some("valar"), "projects") {
+    def * = (id, name, typeId, creatorId, description, reason, methods, active, created) <> (ProjectsRow.tupled, ProjectsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), typeId, Rep.Some(creatorId), description, reason, methods, Rep.Some(active), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> SuperprojectsRow.tupled((_1.get, _2.get, _3, _4.get, _5, _6, _7, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(name), typeId, Rep.Some(creatorId), description, reason, methods, Rep.Some(active), Rep.Some(created)).shaped.<>({r=>import r._; _1.map(_=> ProjectsRow.tupled((_1.get, _2.get, _3, _4.get, _5, _6, _7, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
@@ -3054,14 +2070,14 @@ trait Tables {
 
     /** Foreign key referencing ProjectTypes (database name project_to_project_type) */
     lazy val projectTypesFk = foreignKey("project_to_project_type", typeId, ProjectTypes)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-    /** Foreign key referencing Users (database name superproject_to_user) */
-    lazy val usersFk = foreignKey("superproject_to_user", creatorId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Users (database name project_to_user) */
+    lazy val usersFk = foreignKey("project_to_user", creatorId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
 
     /** Uniqueness Index over (name) (database name name_unique) */
     val index1 = index("name_unique", name, unique=true)
   }
-  /** Collection-like TableQuery object for table Superprojects */
-  lazy val Superprojects = new TableQuery(tag => new Superprojects(tag))
+  /** Collection-like TableQuery object for table Projects */
+  lazy val Projects = new TableQuery(tag => new Projects(tag))
 
   /** Entity class storing rows of table Suppliers
    *  @param id Database column id SqlType(SMALLINT UNSIGNED), AutoInc, PrimaryKey
@@ -3510,226 +2526,6 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table VAnnotations */
   lazy val VAnnotations = new TableQuery(tag => new VAnnotations(tag))
-
-  /** Entity class storing rows of table VCarpProjects
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), Default(0)
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param description Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param projectType Database column project_type SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param ancestor Database column ancestor SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param owner Database column owner SqlType(VARCHAR), Length(20,true), Default(None)
-   *  @param dateModified Database column date_modified SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeModified Database column time_modified SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param dateCreated Database column date_created SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeCreated Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-  case class VCarpProjectsRow(id: Int = 0, name: String, description: Option[String] = None, projectType: Option[String] = None, ancestor: Option[String] = None, owner: Option[String] = None, dateModified: Option[String] = None, timeModified: Option[String] = None, dateCreated: Option[String] = None, timeCreated: Option[String] = None)
-  /** GetResult implicit for fetching VCarpProjectsRow objects using plain SQL queries */
-  implicit def GetResultVCarpProjectsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[VCarpProjectsRow] = GR{
-    prs => import prs._
-    VCarpProjectsRow.tupled((<<[Int], <<[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String]))
-  }
-  /** Table description of table v_carp_projects. Objects of this class serve as prototypes for rows in queries. */
-  class VCarpProjects(_tableTag: Tag) extends profile.api.Table[VCarpProjectsRow](_tableTag, Some("valar"), "v_carp_projects") {
-    def * = (id, name, description, projectType, ancestor, owner, dateModified, timeModified, dateCreated, timeCreated) <> (VCarpProjectsRow.tupled, VCarpProjectsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), description, projectType, ancestor, owner, dateModified, timeModified, dateCreated, timeCreated).shaped.<>({r=>import r._; _1.map(_=> VCarpProjectsRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9, _10)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), Default(0) */
-    val id: Rep[Int] = column[Int]("id", O.Default(0))
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column description SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val description: Rep[Option[String]] = column[Option[String]]("description", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column project_type SqlType(VARCHAR), Length(100,true), Default(None) */
-    val projectType: Rep[Option[String]] = column[Option[String]]("project_type", O.Length(100,varying=true), O.Default(None))
-    /** Database column ancestor SqlType(VARCHAR), Length(100,true), Default(None) */
-    val ancestor: Rep[Option[String]] = column[Option[String]]("ancestor", O.Length(100,varying=true), O.Default(None))
-    /** Database column owner SqlType(VARCHAR), Length(20,true), Default(None) */
-    val owner: Rep[Option[String]] = column[Option[String]]("owner", O.Length(20,varying=true), O.Default(None))
-    /** Database column date_modified SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateModified: Rep[Option[String]] = column[Option[String]]("date_modified", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_modified SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeModified: Rep[Option[String]] = column[Option[String]]("time_modified", O.Length(19,varying=true), O.Default(None))
-    /** Database column date_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateCreated: Rep[Option[String]] = column[Option[String]]("date_created", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeCreated: Rep[Option[String]] = column[Option[String]]("time_created", O.Length(19,varying=true), O.Default(None))
-  }
-  /** Collection-like TableQuery object for table VCarpProjects */
-  lazy val VCarpProjects = new TableQuery(tag => new VCarpProjects(tag))
-
-  /** Entity class storing rows of table VCarpRecentTankTask
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), Default(0)
-   *  @param tank Database column tank SqlType(VARCHAR), Length(12,true), Default(None)
-   *  @param task Database column task SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param notes Database column notes SqlType(VARCHAR), Length(250,true), Default()
-   *  @param dateCreated Database column date_created SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeCreated Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-  case class VCarpRecentTankTaskRow(id: Int = 0, tank: Option[String] = None, task: Option[String] = None, notes: String = "", dateCreated: Option[String] = None, timeCreated: Option[String] = None)
-  /** GetResult implicit for fetching VCarpRecentTankTaskRow objects using plain SQL queries */
-  implicit def GetResultVCarpRecentTankTaskRow(implicit e0: GR[Int], e1: GR[Option[String]], e2: GR[String]): GR[VCarpRecentTankTaskRow] = GR{
-    prs => import prs._
-    VCarpRecentTankTaskRow.tupled((<<[Int], <<?[String], <<?[String], <<[String], <<?[String], <<?[String]))
-  }
-  /** Table description of table v_carp_recent_tank_task. Objects of this class serve as prototypes for rows in queries. */
-  class VCarpRecentTankTask(_tableTag: Tag) extends profile.api.Table[VCarpRecentTankTaskRow](_tableTag, Some("valar"), "v_carp_recent_tank_task") {
-    def * = (id, tank, task, notes, dateCreated, timeCreated) <> (VCarpRecentTankTaskRow.tupled, VCarpRecentTankTaskRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), tank, task, Rep.Some(notes), dateCreated, timeCreated).shaped.<>({r=>import r._; _1.map(_=> VCarpRecentTankTaskRow.tupled((_1.get, _2, _3, _4.get, _5, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), Default(0) */
-    val id: Rep[Int] = column[Int]("id", O.Default(0))
-    /** Database column tank SqlType(VARCHAR), Length(12,true), Default(None) */
-    val tank: Rep[Option[String]] = column[Option[String]]("tank", O.Length(12,varying=true), O.Default(None))
-    /** Database column task SqlType(VARCHAR), Length(100,true), Default(None) */
-    val task: Rep[Option[String]] = column[Option[String]]("task", O.Length(100,varying=true), O.Default(None))
-    /** Database column notes SqlType(VARCHAR), Length(250,true), Default() */
-    val notes: Rep[String] = column[String]("notes", O.Length(250,varying=true), O.Default(""))
-    /** Database column date_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateCreated: Rep[Option[String]] = column[Option[String]]("date_created", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeCreated: Rep[Option[String]] = column[Option[String]]("time_created", O.Length(19,varying=true), O.Default(None))
-  }
-  /** Collection-like TableQuery object for table VCarpRecentTankTask */
-  lazy val VCarpRecentTankTask = new TableQuery(tag => new VCarpRecentTankTask(tag))
-
-  /** Entity class storing rows of table VCarpScans
-   *  @param id Database column id SqlType(INT UNSIGNED), Default(0)
-   *  @param tankInternalId Database column tank_internal_id SqlType(VARCHAR), Length(12,true), Default(None)
-   *  @param scanType Database column scan_type SqlType(ENUM), Length(16,false)
-   *  @param scanValue Database column scan_value SqlType(VARCHAR), Length(250,true), Default()
-   *  @param personScanned Database column person_scanned SqlType(VARCHAR), Length(20,true), Default(None)
-   *  @param dateScanned Database column date_scanned SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeScanned Database column time_scanned SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param dateCreated Database column date_created SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeCreated Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-  case class VCarpScansRow(id: Int = 0, tankInternalId: Option[String] = None, scanType: String, scanValue: String = "", personScanned: Option[String] = None, dateScanned: Option[String] = None, timeScanned: Option[String] = None, dateCreated: Option[String] = None, timeCreated: Option[String] = None)
-  /** GetResult implicit for fetching VCarpScansRow objects using plain SQL queries */
-  implicit def GetResultVCarpScansRow(implicit e0: GR[Int], e1: GR[Option[String]], e2: GR[String]): GR[VCarpScansRow] = GR{
-    prs => import prs._
-    VCarpScansRow.tupled((<<[Int], <<?[String], <<[String], <<[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String]))
-  }
-  /** Table description of table v_carp_scans. Objects of this class serve as prototypes for rows in queries. */
-  class VCarpScans(_tableTag: Tag) extends profile.api.Table[VCarpScansRow](_tableTag, Some("valar"), "v_carp_scans") {
-    def * = (id, tankInternalId, scanType, scanValue, personScanned, dateScanned, timeScanned, dateCreated, timeCreated) <> (VCarpScansRow.tupled, VCarpScansRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), tankInternalId, Rep.Some(scanType), Rep.Some(scanValue), personScanned, dateScanned, timeScanned, dateCreated, timeCreated).shaped.<>({r=>import r._; _1.map(_=> VCarpScansRow.tupled((_1.get, _2, _3.get, _4.get, _5, _6, _7, _8, _9)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT UNSIGNED), Default(0) */
-    val id: Rep[Int] = column[Int]("id", O.Default(0))
-    /** Database column tank_internal_id SqlType(VARCHAR), Length(12,true), Default(None) */
-    val tankInternalId: Rep[Option[String]] = column[Option[String]]("tank_internal_id", O.Length(12,varying=true), O.Default(None))
-    /** Database column scan_type SqlType(ENUM), Length(16,false) */
-    val scanType: Rep[String] = column[String]("scan_type", O.Length(16,varying=false))
-    /** Database column scan_value SqlType(VARCHAR), Length(250,true), Default() */
-    val scanValue: Rep[String] = column[String]("scan_value", O.Length(250,varying=true), O.Default(""))
-    /** Database column person_scanned SqlType(VARCHAR), Length(20,true), Default(None) */
-    val personScanned: Rep[Option[String]] = column[Option[String]]("person_scanned", O.Length(20,varying=true), O.Default(None))
-    /** Database column date_scanned SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateScanned: Rep[Option[String]] = column[Option[String]]("date_scanned", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_scanned SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeScanned: Rep[Option[String]] = column[Option[String]]("time_scanned", O.Length(19,varying=true), O.Default(None))
-    /** Database column date_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateCreated: Rep[Option[String]] = column[Option[String]]("date_created", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeCreated: Rep[Option[String]] = column[Option[String]]("time_created", O.Length(19,varying=true), O.Default(None))
-  }
-  /** Collection-like TableQuery object for table VCarpScans */
-  lazy val VCarpScans = new TableQuery(tag => new VCarpScans(tag))
-
-  /** Entity class storing rows of table VCarpTanks
-   *  @param id Database column id SqlType(MEDIUMINT UNSIGNED), Default(0)
-   *  @param tank Database column tank SqlType(VARCHAR), Length(12,true)
-   *  @param project Database column project SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param variant Database column variant SqlType(VARCHAR), Length(250,true), Default(None)
-   *  @param tankType Database column tank_type SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param projectType Database column project_type SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param recentTask Database column recent_task SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param dateTask Database column date_task SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeTask Database column time_task SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param birthdate Database column birthdate SqlType(DATE)
-   *  @param alive Database column alive SqlType(BIT), Default(true)
-   *  @param notes Database column notes SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
-   *  @param dateCreated Database column date_created SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeCreated Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-  case class VCarpTanksRow(id: Int = 0, tank: String, project: Option[String] = None, variant: Option[String] = None, tankType: Option[String] = None, projectType: Option[String] = None, recentTask: Option[String] = None, dateTask: Option[String] = None, timeTask: Option[String] = None, birthdate: java.sql.Date, alive: Boolean = true, notes: Option[String] = None, dateCreated: Option[String] = None, timeCreated: Option[String] = None)
-  /** GetResult implicit for fetching VCarpTanksRow objects using plain SQL queries */
-  implicit def GetResultVCarpTanksRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]], e3: GR[java.sql.Date], e4: GR[Boolean]): GR[VCarpTanksRow] = GR{
-    prs => import prs._
-    VCarpTanksRow.tupled((<<[Int], <<[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<?[String], <<[java.sql.Date], <<[Boolean], <<?[String], <<?[String], <<?[String]))
-  }
-  /** Table description of table v_carp_tanks. Objects of this class serve as prototypes for rows in queries. */
-  class VCarpTanks(_tableTag: Tag) extends profile.api.Table[VCarpTanksRow](_tableTag, Some("valar"), "v_carp_tanks") {
-    def * = (id, tank, project, variant, tankType, projectType, recentTask, dateTask, timeTask, birthdate, alive, notes, dateCreated, timeCreated) <> (VCarpTanksRow.tupled, VCarpTanksRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(tank), project, variant, tankType, projectType, recentTask, dateTask, timeTask, Rep.Some(birthdate), Rep.Some(alive), notes, dateCreated, timeCreated).shaped.<>({r=>import r._; _1.map(_=> VCarpTanksRow.tupled((_1.get, _2.get, _3, _4, _5, _6, _7, _8, _9, _10.get, _11.get, _12, _13, _14)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(MEDIUMINT UNSIGNED), Default(0) */
-    val id: Rep[Int] = column[Int]("id", O.Default(0))
-    /** Database column tank SqlType(VARCHAR), Length(12,true) */
-    val tank: Rep[String] = column[String]("tank", O.Length(12,varying=true))
-    /** Database column project SqlType(VARCHAR), Length(100,true), Default(None) */
-    val project: Rep[Option[String]] = column[Option[String]]("project", O.Length(100,varying=true), O.Default(None))
-    /** Database column variant SqlType(VARCHAR), Length(250,true), Default(None) */
-    val variant: Rep[Option[String]] = column[Option[String]]("variant", O.Length(250,varying=true), O.Default(None))
-    /** Database column tank_type SqlType(VARCHAR), Length(100,true), Default(None) */
-    val tankType: Rep[Option[String]] = column[Option[String]]("tank_type", O.Length(100,varying=true), O.Default(None))
-    /** Database column project_type SqlType(VARCHAR), Length(100,true), Default(None) */
-    val projectType: Rep[Option[String]] = column[Option[String]]("project_type", O.Length(100,varying=true), O.Default(None))
-    /** Database column recent_task SqlType(VARCHAR), Length(100,true), Default(None) */
-    val recentTask: Rep[Option[String]] = column[Option[String]]("recent_task", O.Length(100,varying=true), O.Default(None))
-    /** Database column date_task SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateTask: Rep[Option[String]] = column[Option[String]]("date_task", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_task SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeTask: Rep[Option[String]] = column[Option[String]]("time_task", O.Length(19,varying=true), O.Default(None))
-    /** Database column birthdate SqlType(DATE) */
-    val birthdate: Rep[java.sql.Date] = column[java.sql.Date]("birthdate")
-    /** Database column alive SqlType(BIT), Default(true) */
-    val alive: Rep[Boolean] = column[Boolean]("alive", O.Default(true))
-    /** Database column notes SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
-    val notes: Rep[Option[String]] = column[Option[String]]("notes", O.Length(16777215,varying=true), O.Default(None))
-    /** Database column date_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateCreated: Rep[Option[String]] = column[Option[String]]("date_created", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeCreated: Rep[Option[String]] = column[Option[String]]("time_created", O.Length(19,varying=true), O.Default(None))
-  }
-  /** Collection-like TableQuery object for table VCarpTanks */
-  lazy val VCarpTanks = new TableQuery(tag => new VCarpTanks(tag))
-
-  /** Entity class storing rows of table VCarpTankTypes
-   *  @param id Database column id SqlType(SMALLINT UNSIGNED), Default(0)
-   *  @param name Database column name SqlType(VARCHAR), Length(100,true)
-   *  @param projectType Database column project_type SqlType(VARCHAR), Length(100,true), Default(None)
-   *  @param description Database column description SqlType(VARCHAR), Length(255,true)
-   *  @param dateCreated Database column date_created SqlType(VARCHAR), Length(19,true), Default(None)
-   *  @param timeCreated Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-  case class VCarpTankTypesRow(id: Int = 0, name: String, projectType: Option[String] = None, description: String, dateCreated: Option[String] = None, timeCreated: Option[String] = None)
-  /** GetResult implicit for fetching VCarpTankTypesRow objects using plain SQL queries */
-  implicit def GetResultVCarpTankTypesRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[VCarpTankTypesRow] = GR{
-    prs => import prs._
-    VCarpTankTypesRow.tupled((<<[Int], <<[String], <<?[String], <<[String], <<?[String], <<?[String]))
-  }
-  /** Table description of table v_carp_tank_types. Objects of this class serve as prototypes for rows in queries. */
-  class VCarpTankTypes(_tableTag: Tag) extends profile.api.Table[VCarpTankTypesRow](_tableTag, Some("valar"), "v_carp_tank_types") {
-    def * = (id, name, projectType, description, dateCreated, timeCreated) <> (VCarpTankTypesRow.tupled, VCarpTankTypesRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), projectType, Rep.Some(description), dateCreated, timeCreated).shaped.<>({r=>import r._; _1.map(_=> VCarpTankTypesRow.tupled((_1.get, _2.get, _3, _4.get, _5, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(SMALLINT UNSIGNED), Default(0) */
-    val id: Rep[Int] = column[Int]("id", O.Default(0))
-    /** Database column name SqlType(VARCHAR), Length(100,true) */
-    val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column project_type SqlType(VARCHAR), Length(100,true), Default(None) */
-    val projectType: Rep[Option[String]] = column[Option[String]]("project_type", O.Length(100,varying=true), O.Default(None))
-    /** Database column description SqlType(VARCHAR), Length(255,true) */
-    val description: Rep[String] = column[String]("description", O.Length(255,varying=true))
-    /** Database column date_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val dateCreated: Rep[Option[String]] = column[Option[String]]("date_created", O.Length(19,varying=true), O.Default(None))
-    /** Database column time_created SqlType(VARCHAR), Length(19,true), Default(None) */
-    val timeCreated: Rep[Option[String]] = column[Option[String]]("time_created", O.Length(19,varying=true), O.Default(None))
-  }
-  /** Collection-like TableQuery object for table VCarpTankTypes */
-  lazy val VCarpTankTypes = new TableQuery(tag => new VCarpTankTypes(tag))
 
   /** Entity class storing rows of table VExperiments
    *  @param id Database column id SqlType(SMALLINT UNSIGNED), Default(0)

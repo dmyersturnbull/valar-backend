@@ -1,6 +1,7 @@
 package valar
 
 import com.typesafe.scalalogging.LazyLogging
+import slick.jdbc.JdbcBackend.Database
 import slick.dbio.DBIO
 import slick.jdbc.JdbcBackend._
 
@@ -12,7 +13,7 @@ package object core extends LazyLogging {
 
 	lazy val valarCommitHash: Array[Byte] = thisGitCommitSha1Bytes
 
-	def loadDb() = ValarConfig.instance.load
+	def loadDb(): Database = ValarConfig.instance.load
 
 	def exec[T](action: DBIO[T], waitSeconds: Int = 120)(implicit db: Database): T = Await.result(db run action, waitSeconds.seconds)
 

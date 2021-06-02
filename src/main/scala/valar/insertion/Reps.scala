@@ -168,7 +168,7 @@ case class CompoundData(
   def hasInchi: Boolean = inchi.trim != "*"
   require(Set("compound", "mixture", "exposure", "blinded") contains kind, s"$kind is not a valid batch type")
   //require(isFreshStock || madeFrom.nonEmpty, s"If a dry stock, leave off 'box', 'well', and 'made from'. Otherwise fill out 'made from' and fill 'box' and 'well' if applicable.")
-  //require(isFreshStock || amount.toLowerCase.endsWith("mL"), s"If not a dry stock, use 'mL' for amount")
+  //require(isFreshStock || amount.toLowerCase(Locale.ENGLISH).endsWith("mL"), s"If not a dry stock, use 'mL' for amount")
   def compoundLabels: Set[String] = extract(compoundLabelsText).toSet
   def batchLabels: Set[String] = extract(batchLabelsText).toSet
   private def extract(o: Option[String]): Seq[String] =

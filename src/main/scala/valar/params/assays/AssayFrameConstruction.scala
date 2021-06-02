@@ -7,7 +7,6 @@ import valar.core.{loadDb, exec}
 import scala.collection.mutable
 import pippin.grammars._
 import pippin.grammars.params.{DollarSignParam, DollarSignParams, DollarSignSub, Ization}
-import valar.core.CommonQueries.{listStimuli, listTemplateStimulusFrames}
 import valar.core.{StimFramesAndHash, StimulusFramesInfo, loadDb}
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 

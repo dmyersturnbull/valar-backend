@@ -21,11 +21,6 @@ class Security(implicit database: Database) {
     } else false
   }
 
-  def setPassword(username: String, password: String): Unit = {
-    val nChanged: Int = exec(Users filter (_.username === username) map (_.bcryptHash) update Some(bcrypt(password)))
-    if (nChanged != 1) throw new IllegalArgumentException(s"No user with username $username exists")
-  }
-
   def bcrypt(password: String): String = {
     BCrypt.hashpw(password, BCrypt.gensalt(13))
   }

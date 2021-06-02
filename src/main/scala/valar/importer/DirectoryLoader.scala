@@ -63,7 +63,16 @@ object DirectoryLoader extends LazyLogging {
   }
 
 
-  private def _load(submissionHash: String, tomlFile: Path, environmentFile: Path, logFile: Path, root: Path, videoFile: Path, timingDir: Path, sensorsDir: Path): SubmissionResult = {
+  private def _load(
+      submissionHash: String,
+      tomlFile: Path,
+      environmentFile: Path,
+      logFile: Path,
+      root: Path,
+      videoFile: Path,
+      timingDir: Path,
+      sensorsDir: Path
+  ): SubmissionResult = {
 
     require(Files.isRegularFile(tomlFile), s"TOML path $tomlFile is not a file")
     require(Files.isRegularFile(environmentFile), s"Environment path $tomlFile is not a file")
@@ -80,14 +89,8 @@ object DirectoryLoader extends LazyLogging {
     }
 
     // TODO allow override with a flag set
-    /*
-    exec((Runs filter (_.submissionId === submission.id) map (_.id)).result).headOption foreach {
-      run =>
-        States.set(root, States.InvalidHash)
-        throw new SubmissionInconsistencyException(s"SauronX submission ${submission.lookupHash} was already used for run $run")
-    }
-    */
-
+    val run = exec((Runs filter (_.submissionId === submission.id)).result).headOption
+    
     val environment = Try(new SauronxEnvironment(ConfigFactory.parseFile(environmentFile.toFile, ConfigParseOptions.defaults().setAllowMissing(false)))) match {
       case Success(env) => env
       case Failure(e: ConfigException) =>
@@ -106,20 +109,7 @@ object DirectoryLoader extends LazyLogging {
 
     val logFileText = Source.fromFile(logFile.toFile).mkString
 
-    SubmissionResult(submission, tomlText, tomlConfig, environment, logFileText, root, videoFile, timingDir, sensorsDir)
+    SubmissionResult(submission, run, tomlText, tomlConfig, environment, logFileText, root, videoFile, timingDir, sensorsDir)
   }
-
-  def main(args: Array[String]): Unit = {
-    val path = Paths.get(args(0))
-    val features = args.tail map getFeature
-    val submission = load(path)
-    // step 1: Create run
-    val run = Importer.insert(submission)
-    // step 2: Insert sensors
-    new RegistrySensorProcessor(dir).apply(run)
-    // step 3: Insert feature(s)
-    for (feature <- features) {
-      feature.apply(run, submission.videoFile)
-    }
-  }
+  
 }

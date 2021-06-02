@@ -371,18 +371,3 @@ class SensorHelper(result: SubmissionResult, plateRun: RunsRow, nBatteryMillis: 
     (ZonedDateTime.of(LocalDateTime.parse(string.replace(' ', 'T')), result.config.local.timezone.name).toInstant.toEpochMilli - startMillis).toInt
 }
 
-
-object SensorProcessor {
-
-  private implicit val db = loadDb()
-  import valar.core.Tables._
-  import valar.core.Tables.profile.api._
-
-  def main(args: Array[String]): Unit = {
-    val dir = DirectoryLoader.load(Paths.get(args(0)))
-    val run = exec((Runs filter (_.submissionId.getOrElse(0) === dir.submission.id)).result).headOption getOrElse {
-      throw new MissingResourceException(s"No run for submission ${dir.submission.id}")
-    }
-    new RegistrySensorProcessor(dir).apply(run)
-  }
-}

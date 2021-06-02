@@ -1,5 +1,7 @@
 package valar.features
 
+import slick.jdbc.JdbcBackend.Database
+
 import java.nio.file.{Path, Paths}
 import java.time.{LocalDateTime, ZonedDateTime}
 import java.time.temporal.ChronoUnit
@@ -18,7 +20,7 @@ import scala.util.{Failure, Success, Try}
 
 trait GenFeatureInserter[V] extends LazyLogging {
 
-  private implicit val db = loadDb()
+  private implicit val db: Database = loadDb()
   import valar.core.Tables._
   import valar.core.Tables.profile.api._
 
@@ -40,7 +42,10 @@ trait GenFeatureInserter[V] extends LazyLogging {
 }
 
 
-abstract class PlainFeatureInserter[V](container: ContainerFormat, codec: Codec)(implicit ct: ClassTag[V]) extends GenFeatureInserter[V] {
+abstract class PlainFeatureInserter[V]\
+    (container: ContainerFormat, codec: Codec)\
+    (implicit ct: ClassTag[V])\
+    extends GenFeatureInserter[V] {
 
   private implicit val db = loadDb()
   import valar.core.Tables._
@@ -75,7 +80,10 @@ abstract class PlainFeatureInserter[V](container: ContainerFormat, codec: Codec)
       case Failure(e) => throw new FeatureCalculationFailedException(s"${valar.name} calculation on run ${run.tag} failed", e)
     }
     val finishedCalc = LocalDateTime.now()
-    logger.info(s"Calculating ${valar.name} on ${run.tag} took ${ChronoUnit.SECONDS.between(started, finishedCalc)} seconds from $started to $finishedCalc")
+    logger.info(
+        s"Calculating ${valar.name} on ${run.tag} took ${ChronoUnit.SECONDS.between(started, finishedCalc)}" +
+        s"seconds from $started to $finishedCalc"
+    )
 
     for (((roi, floats), i) <- results.zipWithIndex) {
       insert(converter(floats), roi)
@@ -150,14 +158,4 @@ object FeatureProcessor {
     }
   }
   
-  def main(args: Array[String]): Unit = {
-    val feature = getFeature(args(0)) 
-    val run: Try[RunsRow] = Try(args(1).toInt) map (r => exec((Runs filter (_.id === r)).result).head)
-    val path = Paths.get(args(2))
-    run match {
-      case Success(r) =>
-        feature.apply(r, path)
-      case Failure(e) => throw e
-    }
-  }
 }

@@ -83,18 +83,6 @@ object RowHashes {
     } map {case (id, name, hash) => MatchingAssay(id, name, hash)} // just because that tuple is too complex
   }
 
-  /**
-    * Sets / fixes all of the hashes.
-    */
-  def main(args: Array[String]): Unit = {
-    for (assay <- exec(Assays.result)) {
-      fixAssayHash(assay)
-    }
-    for (battery <- exec(Batteries.result)) {
-      fixBatteryHash(battery)
-    }
-  }
-
   def fixBatteryHash(battery: BatteriesRow) = {
     val assayPositions = exec((AssayPositions filter (_.batteryId === battery.id)).result)
     val q = for {

@@ -3,6 +3,7 @@ package valar.importer
 import java.time.{Duration, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
+import slick.jdbc.JdbcBackend.Database
 import com.typesafe.scalalogging.LazyLogging
 import valar.core._
 import pippin.misc.FileHasher
@@ -20,10 +21,9 @@ import valar.core.ImageCodec
 import scala.io.Source
 
 
-
 object Importer extends LazyLogging {
 
-  implicit val db = loadDb()
+  implicit val db: Database = loadDb()
 
   import valar.core.Tables._
   import valar.core.Tables.profile.api._
@@ -138,7 +138,7 @@ object Importer extends LazyLogging {
         datetimeModified = timestamp(),
         status = Some(status),
         submissionId = result.submission.id,
-                    sauronId = result.config.sauron.number,
+        sauronId = result.config.sauron.number,
         created = toSqlTimestamp(result.environment.datetimeStarted.atZone(DateTimeUtils.dbZone))
     ))
   }

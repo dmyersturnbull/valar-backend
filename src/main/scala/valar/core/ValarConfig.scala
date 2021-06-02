@@ -2,15 +2,27 @@ package valar.core
 
 import java.time.ZoneId
 import slick.jdbc.JdbcBackend.Database
-import System.err.{println => printerrln}
-import java.io.File
 
+import java.io.{File, FileNotFoundException}
 import com.typesafe.config.{Config, ConfigFactory}
 
-class ValarConfig(val config: Config = ConfigFactory.parseFile(new File("conf/application.conf"))) {
+import java.nio.file.{Path, Paths}
+
+
+def getConfigPath(): Path = {
+  val etcPath = Paths.get("/", "etc", "Valarfile")
+  val appPath = Paths.get("conf", "application.conf") // mainly for testing
+  sys.env.get("VALAR_CONFIG") match {
+    case Some(p) => Paths.get(p)
+    case (None, etcPath.exists()) => etcPath
+    case _ => throw new FileNotFoundException(s"Provide a config file at $$VALAR_CONFIG or $etcPath")
+  }
+}
+
+
+class ValarConfig(val config: Config = ConfigFactory.parseFile(getConfigPath())) {
 
   val timezone: ZoneId = ZoneId.systemDefault()
-  val chemspiderToken: String = config.getString("chemspiderToken")
 
   private lazy val db: Database = try {
     Database.forConfig("valar_db", config)
@@ -31,12 +43,4 @@ object ValarConfig {
 
   var instance: ValarConfig = new ValarConfig()
 
-  def main(args: Array[String]): Unit = {
-    implicit val db = instance.db
-    import valar.core.Tables._
-    import valar.core.Tables.profile.api._
-    println("Users: " + exec((
-      Users map (_.username)
-    ).result).mkString(", "))
-  }
 }

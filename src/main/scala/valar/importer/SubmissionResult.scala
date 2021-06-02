@@ -4,12 +4,19 @@ import java.nio.file.{Files, Path, Paths}
 import java.util.regex.Pattern
 import com.google.common.base.CaseFormat
 import com.typesafe.scalalogging.LazyLogging
-import valar.core.Tables.SubmissionsRow
+import valar.core.Tables.{RunsRow, SubmissionsRow}
 
 case class SubmissionResult(
     submission: SubmissionsRow,
-    tomlText: String, config: TomlConfig, environment: SauronxEnvironment, logFileText: String,
-    root: Path, videoFile: Path, timing: Path, sensors: Path,
+    run: RunsRow,
+    tomlText: String,
+    config: TomlConfig,
+    environment: SauronxEnvironment,
+    logFileText: String,
+    root: Path,
+    videoFile: Path,
+    timing: Path,
+    sensors: Path,
 ) extends LazyLogging {
   require(Files.isDirectory(timing), "Timing path is not a directory")
   require(Files.isDirectory(sensors), "Sensor path is not a directory")

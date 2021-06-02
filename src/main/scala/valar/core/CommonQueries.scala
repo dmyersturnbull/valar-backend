@@ -1,34 +1,21 @@
 package valar.core
 
 import com.typesafe.scalalogging.Logger
+import slick.jdbc.JdbcBackend.Database
+
+import java.util.Locale
 
 object CommonQueries {
 
   val logger: Logger = Logger(getClass)
-  implicit val db = loadDb()
+  implicit val db: Database = loadDb()
   import valar.core.Tables._
   import valar.core.Tables.profile.api._
-
 
   def nPlates: Int = exec(Plates.length.result)
   def nProjects: Int = exec(Experiments.length.result)
   def nCompounds: Int = exec(Compounds.length.result)
   def nOrderedCompounds: Int = exec(Batches.length.result)
-
-
-  def listSaurons: Seq[Byte] = exec((Saurons map (_.id)).result)
-
-  def listUsers: Seq[UsersRow] = {
-    exec(Users.result)
-  }
-
-  def listLoginUsers: Seq[UsersRow] = {
-    exec((Users filter (_.bcryptHash.isDefined)).result)
-  }
-
-  def listWriteAuthorizedUsers: Seq[UsersRow] = {
-    exec((Users filter (_.bcryptHash.isDefined) filter (_.writeAccess)).result)
-  }
 
   def nCompoundsPerDataSource: Map[String, Int] = {
     exec((
@@ -51,7 +38,9 @@ object CommonQueries {
   def refIds: Map[String, Int] = (exec((
     Refs map (s => (s.name, s.id))
   ).result) map (s => s._1 -> s._2)).toMap
+  
   def refNames: Map[Int, String] = dataSourceIds map (e => e._2 -> e._1)
+  
   def dataSourceNames: Map[Int, String] = dataSourceIds map (e => e._2 -> e._1)
 
   def userNames: Map[Int, String] = (listUsers map (u => u.id -> s"${u.firstName} ${u.lastName}")).toMap
@@ -82,7 +71,7 @@ object CommonQueries {
     val mp = listBatches filter (_._2.isDefined) groupBy (_._2.get.id)
     listCompoundNames map {compoundName =>
       val ocs = if (mp contains compoundName.compoundId) mp(compoundName.compoundId) else Seq.empty
-      compoundName.name.toLowerCase -> ocs
+      compoundName.name.toLowerCase(Locale.ENGLISH) -> ocs
     }
   }.toMap
 
@@ -108,8 +97,6 @@ object CommonQueries {
   def listBatteries: Seq[BatteriesRow] = exec(Batteries.result)
 
   def listAssays: Seq[AssaysRow] = exec(Assays.result)
-
-  def listStimuli: Seq[StimuliRow] = exec(Stimuli.result)
 
   def listTemplatePlates: Seq[TemplatePlatesRow] = exec(TemplatePlates.result)
 

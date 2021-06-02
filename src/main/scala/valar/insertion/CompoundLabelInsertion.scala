@@ -16,24 +16,24 @@ import scala.util.control.NonFatal
 
 object CompoundLabelInsertion {
 
-	val logger: Logger = Logger(getClass)
-	private implicit val db = loadDb()
+  val logger: Logger = Logger(getClass)
+  private implicit val db = loadDb()
 
-	import valar.core.Tables._
-	import valar.core.Tables.profile.api._
+  import valar.core.Tables._
+  import valar.core.Tables.profile.api._
 
-	def insert(data: CompoundLabelData, refId: Byte): CompoundLabelsRow = attempt { () => {
-		val result = exec((CompoundLabels filter (_.refId === data.refId) filter (_.compoundId === data.compoundId) filter (_.name === data.name)).result).headOption
-		result getOrElse {
-			val query = CompoundLabels returning (CompoundLabels map (_.id)) into ((newRow, id) => newRow.copy(id = id))
-			exec(query += CompoundLabelsRow(
-				id = 0,
-				refId = data.refId,
-				compoundId = data.compoundId,
-				name = data.name,
-				created = timestamp()
-			))
-		}
-	}}
+  def insert(data: CompoundLabelData, refId: Byte): CompoundLabelsRow = attempt { () => {
+    val result = exec((CompoundLabels filter (_.refId === data.refId) filter (_.compoundId === data.compoundId) filter (_.name === data.name)).result).headOption
+    result getOrElse {
+      val query = CompoundLabels returning (CompoundLabels map (_.id)) into ((newRow, id) => newRow.copy(id = id))
+      exec(query += CompoundLabelsRow(
+        id = 0,
+        refId = data.refId,
+        compoundId = data.compoundId,
+        name = data.name,
+        created = timestamp()
+      ))
+    }
+  }}
 
 }

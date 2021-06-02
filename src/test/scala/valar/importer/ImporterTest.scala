@@ -7,8 +7,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 class ImporterTest extends PropSpec with GeneratorDrivenPropertyChecks with Matchers {
 
-//	property("integration") {
-//		Importer.insert(DirectoryLoader.load(Paths.get("/home/dmyerstu/desktop/1211f6050b80")))
-//	}
+//  property("integration") {
+//    Importer.insert(DirectoryLoader.load(Paths.get("/home/dmyerstu/desktop/1211f6050b80")))
+//  }
 
 }

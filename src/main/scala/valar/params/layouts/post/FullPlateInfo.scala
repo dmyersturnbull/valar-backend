@@ -8,11 +8,11 @@ import valar.core.Tables.profile.api._
   * This is trivial to insert into Valar as WellsRow and WellTreatments instances under a RunsRow.
   */
 case class FullPlateInfo(
-	controls: Map[Int, Option[ControlTypesRow]],
-	nFish: Map[Int, Int],
-	ages: Map[Int, Option[Int]],
-	variants: Map[Int, Option[GeneticVariantsRow]],
-	groups: Map[Int, Option[String]],
-	compounds: Map[Int, List[BatchesRow]],
-	doses: Map[Int, List[Double]]
+  controls: Map[Int, Option[ControlTypesRow]],
+  nFish: Map[Int, Int],
+  ages: Map[Int, Option[Int]],
+  variants: Map[Int, Option[GeneticVariantsRow]],
+  groups: Map[Int, Option[String]],
+  compounds: Map[Int, List[BatchesRow]],
+  doses: Map[Int, List[Double]]
 )

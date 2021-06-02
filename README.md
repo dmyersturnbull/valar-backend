@@ -92,11 +92,11 @@ First, you will need `conf/application.conf`. An example is shown here:
 ```
 driver = "slick.jdbc.MySQLProfile"
 valar_db {
-	url = "jdbc:mysql://127.0.0.1:3306/valar?user=dbuser&password=dbpassword&useJDBCCompliantTimezoneShift=true&serverTimezone=America/Los_Angeles&nullNamePatternMatchesAll=true"
-	driver = com.mysql.cj.jdbc.Driver
-	maxThreads = 4
-	maxConnections = 4
-	maximumPoolSize = 10
+  url = "jdbc:mysql://127.0.0.1:3306/valar?user=dbuser&password=dbpassword&useJDBCCompliantTimezoneShift=true&serverTimezone=America/Los_Angeles&nullNamePatternMatchesAll=true"
+  driver = com.mysql.cj.jdbc.Driver
+  maxThreads = 4
+  maxConnections = 4
+  maximumPoolSize = 10
 }
 valar_api_key=...
 ```
